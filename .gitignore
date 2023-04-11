@@ -1,6 +1,7 @@
 /rynok/src/main/resources/application-local.properties
 /rynok/src/main/resources/application-prod.properties
 /rynok/src/main/resources/application.properties
+/rynok/out/artifacts/rynok_jar/rynok.jar
 
 ### STS ###
 .apt_generated
