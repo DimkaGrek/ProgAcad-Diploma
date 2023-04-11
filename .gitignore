@@ -1,2 +1,5 @@
 templates/
 repository_backup/
+rynok/src/main/resources/application-local.properties
+rynok/src/main/resources/application-prod.properties
+rynok/src/main/resources/application.properties
