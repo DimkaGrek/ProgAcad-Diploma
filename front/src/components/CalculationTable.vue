@@ -36,6 +36,8 @@ export default {
   ],
 
   setup(props, { emit }) {
+    const showPDF = ref(null);
+    const pdfIframe = ref(null);
     console.log("props counterData: ", props.counterData);
     const selectedIds = ref([]);
     const selectedColumn = ref("");
@@ -119,6 +121,8 @@ export default {
         );
       } else console.log("Квитанции не выбраны");
     };
+
+    const pdfDataURI = ref(null);
 
     const callPrintCalculations = async () => {
       console.log("Функция печати квитанций вызвана");
@@ -352,8 +356,53 @@ export default {
             },
           },
         };
-        pdfMake.createPdf(docDefinition).open();
+        console.log("open PDF...");
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        // console.log("pdfDocGenerator : ", pdfDocGenerator);
+
+        const pdfBlob = await new Promise((resolve, reject) => {
+          pdfDocGenerator.getBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject("Error creating Blob");
+            }
+          });
+        });
+
+        pdfDataURI.value = URL.createObjectURL(pdfBlob);
+        // version with not work print
+        // pdfDataURI.value = await new Promise((resolve) => {
+        //   pdfDocGenerator.getBase64((base64) => {
+        //     resolve(`data:application/pdf;base64,${base64}`);
+        //   });
+        // });
+
+        showPDF.value = true;
+        // console.log("pdfDataURI: ", pdfDataURI.value);
       } else console.log("Квитанции не выбраны");
+    };
+
+    const printPDF = () => {
+      if (pdfIframe.value) {
+        pdfIframe.value.contentWindow.print();
+      }
+    };
+
+    const getCurrentDate = () => {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, "0");
+      const month = String(today.getMonth() + 1).padStart(2, "0"); // Месяцы считаются с 0 до 11
+      const year = today.getFullYear();
+
+      return `${day}-${month}-${year}`;
+    };
+
+    const savePDF = () => {
+      const link = document.createElement("a");
+      link.href = pdfDataURI.value;
+      link.download = "invoicePDF-" + getCurrentDate() + ".pdf";
+      link.click();
     };
 
     const callDeleteCalculations = () => {
@@ -439,6 +488,11 @@ export default {
       selectedIdForDelete,
       showAttentionMessage,
       deleteCalculations,
+      pdfDataURI,
+      showPDF,
+      pdfIframe,
+      printPDF,
+      savePDF,
       props,
     };
   },
@@ -451,6 +505,17 @@ export default {
   selectedIdForPayment: {{ selectedIdForPayment }} selectedAmountForPayment:
   {{ selectedAmountForPayment }} <br />
   isСheckedForPayment: {{ isСheckedForPayment }} -->
+  <div class="modal" v-if="showPDF">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img @click="savePDF" src="./icons/save.png" alt="save" />
+        <img @click="printPDF" src="./icons/print.png" alt="print" />
+        <img @click="showPDF = false" src="./icons/cancel.png" alt="close" />
+      </div>
+      <iframe ref="pdfIframe" class="pdf-iframe" :src="pdfDataURI"></iframe>
+    </div>
+  </div>
+
   <div class="table-scroll">
     <div v-if="showAttentionMessage" class="attention">
       <h1 class="ff-500-18">{{ $translate.t("areYouSure") }}</h1>
@@ -658,5 +723,51 @@ export default {
   border: 1px solid #aa5b00;
   border-radius: 8px;
   text-align: center;
+}
+
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  height: 70%;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: calc(100% - 30px);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0px;
+}
+.modal-header img {
+  width: 25px;
+  cursor: pointer;
 }
 </style>

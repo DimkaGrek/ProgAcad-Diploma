@@ -662,10 +662,6 @@ export default {
             >
               {{ $translate.t("btnDocum") }}
             </button>
-            <div>
-              Username: {{ username }}
-              <span class="link-text indi" @click="logout">Разлогиниться</span>
-            </div>
           </div>
           <div class="menu-right">
             <button
