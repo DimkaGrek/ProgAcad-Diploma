@@ -453,13 +453,13 @@ export default {
   isСheckedForPayment: {{ isСheckedForPayment }} -->
   <div class="table-scroll">
     <div v-if="showAttentionMessage" class="attention">
-      <h1 class="ff-500-18">Ви впевнені ?</h1>
+      <h1 class="ff-500-18">{{ $translate.t("areYouSure") }}</h1>
       <div class="add-footer">
         <button @click="showAttentionMessage = false" class="btn-tbl ff-500-14">
-          Закрити
+          {{ $translate.t("close") }}
         </button>
         <button @click="deleteCalculations" class="btn-tbl ff-500-14">
-          Підтвердити
+          {{ $translate.t("confirm") }}
         </button>
       </div>
     </div>
@@ -477,16 +477,18 @@ export default {
               <span class="checkbox-custom"></span>
             </label>
           </th>
-          <th @click="selectedColumn = 'month'">ПЕРИОД</th>
-          <th>ДАТА</th>
-          <th>АРЕНДАТОР</th>
-          <th>ТЕК. ПОКАЗАНИЯ</th>
-          <th>ПРЕД. ПОКАЗАНИЯ</th>
-          <th>РАЗНИЦА</th>
-          <th>ТАРИФ</th>
-          <th>СУММА</th>
-          <th>ПРИМЕЧАНИЯ</th>
-          <th>ОПЛАТА</th>
+          <th @click="selectedColumn = 'month'">
+            {{ $translate.t("tablePeriodUpper") }}
+          </th>
+          <th>{{ $translate.t("tableDateUpper") }}</th>
+          <th>{{ $translate.t("tableTenantUpper") }}</th>
+          <th>{{ $translate.t("tableCurrReadUpper") }}</th>
+          <th>{{ $translate.t("tablePrevReadUpper") }}</th>
+          <th>{{ $translate.t("tableDifferenceUpper") }}</th>
+          <th>{{ $translate.t("tableRateUpper") }}</th>
+          <th>{{ $translate.t("tableAmountUpper") }}</th>
+          <th>{{ $translate.t("infoUpper") }}</th>
+          <th>{{ $translate.t("tablePaymentUpper") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -589,14 +591,14 @@ export default {
                   @click="selectPay(c.id, c.amount)"
                   class="ff-500-14 link-text"
                   :class="{ needpay: c.payment == null }"
-                  >Оплата</span
+                  >{{ $translate.t("payment") }}</span
                 >
                 <span
                   v-else-if="
                     c.payment == 0 || (c.payment > -0.001 && c.payment < 0)
                   "
                   :class="{ paid: c.payment == 0 }"
-                  >Оплачено</span
+                  >{{ $translate.t("paid") }}</span
                 >
                 <span
                   v-else-if="c.payment > 0"
@@ -620,13 +622,14 @@ export default {
     </table>
   </div>
   <div v-if="selectedIds.length > 0" class="info-text selected-text">
-    Вибрано всього <span class="black">{{ selectedIds.length }}</span> квитанцій
-    на суму
+    {{ $translate.t("selectAll") }}
+    <span class="black">{{ selectedIds.length }}</span>
+    {{ $translate.t("accuralsForAmount") }}
     <span class="black">{{ selectedTotalAmount.toFixed(2) }}</span>
     <template v-if="selectedIdForPayment.length > 0">
-      / Вибрано для оплати
-      <span class="black">{{ selectedIdForPayment.length }}</span> квитанцій на
-      суму
+      / {{ $translate.t("selectedForPayment") }}
+      <span class="black">{{ selectedIdForPayment.length }}</span>
+      {{ $translate.t("accuralsForAmount") }}
       <span class="black">{{ selectedAmountForPayment.toFixed(2) }}</span>
     </template>
   </div>

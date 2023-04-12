@@ -1,6 +1,4 @@
 //import MyButton from "MyButton";
-import MyDialog from "@/components/UI/MyDialog.vue";
+import MyDialog from "../UI/MyDialog.vue";
 
-export default [
-    MyDialog,
-];
+export default [MyDialog];

@@ -180,17 +180,20 @@ export default defineComponent({
     <div class="add-header">
       <h1 class="ff-500-18">
         {{
-          showUpdateCounter ? "Редагувати лічильник" : "Додати новий лічильник"
+          showUpdateCounter
+            ? $translate.t("formHeadCounterEdit")
+            : $translate.t("formHeadCounterAdd")
         }}
       </h1>
-      <small>( * - обовя'зкові поля)</small>
+      <small>( * - {{ $translate.t("requiredFields") }})</small>
       <!-- showUpdateCounter: {{ props.showUpdateCounter }} -->
     </div>
     <div class="add-main ff-500-14">
       <form @submit.prevent="">
         <div class="label">
           <label for="pavilion"
-            >№ Павільйону <span class="indi-500">*</span></label
+            >{{ $translate.t("formPavilion") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -205,13 +208,17 @@ export default defineComponent({
               invalid: !form.pavilion.valid && form.pavilion.touched,
             }"
           />
-          <small v-if="form.pavilion.touched && form.pavilion.errors.required"
-            >Будь-ласка введіть № павільону</small
+          <small
+            v-if="form.pavilion.touched && form.pavilion.errors.required"
+            >{{ $translate.t("formErrorPavilionReq") }}</small
           >
         </div>
 
         <div class="label">
-          <label for="place">№ Місця <span class="indi-500">*</span></label>
+          <label for="place"
+            >{{ $translate.t("formPlace") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -225,14 +232,15 @@ export default defineComponent({
               invalid: !form.place.valid && form.place.touched,
             }"
           />
-          <small v-if="form.place.touched && form.place.errors.required"
-            >Будь-ласка введіть № місця</small
-          >
+          <small v-if="form.place.touched && form.place.errors.required">{{
+            $translate.t("formErrorPlaceReq")
+          }}</small>
         </div>
 
         <div class="label">
           <label for="type"
-            >Тип лічильника <span class="indi-500">*</span></label
+            >{{ $translate.t("formTypeCounter") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -247,14 +255,15 @@ export default defineComponent({
               invalid: !form.type.valid && form.type.touched,
             }"
           />
-          <small v-if="form.type.touched && form.type.errors.required"
-            >Будь-ласка введіть Тип лічильника</small
-          >
+          <small v-if="form.type.touched && form.type.errors.required">{{
+            $translate.t("formErrorTypeReq")
+          }}</small>
         </div>
 
         <div class="label">
           <label for="number"
-            >№ Лічильника <span class="indi-500">*</span></label
+            >{{ $translate.t("formCounter") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -270,24 +279,25 @@ export default defineComponent({
               invalid: !form.number.valid && form.number.touched,
             }"
           />
-          <small v-if="form.number.touched && form.number.errors.required"
-            >Будь-ласка введіть № лічильника</small
-          >
+          <small v-if="form.number.touched && form.number.errors.required">{{
+            $translate.t("formErrorCounterNumReq")
+          }}</small>
           <small v-else-if="form.number.touched && form.number.errors.minLength"
-            >№ лічильника повинен бути не меньше 5 знаків. Зараз
+            >{{ $translate.t("formErrorCounterMinLength") }}
             {{ form.number.value.length }}.</small
           >
           <small v-else-if="form.number.touched && form.number.errors.number"
-            >№ лічильника повинен бути числом.</small
+            >{{ $translate.t("formErrorCounterDigital") }}.</small
           >
           <small v-else-if="form.number.touched && state.existCounter"
-            >Такий лічильник вже існує.</small
+            >{{ $translate.t("formErrorCounterExist") }}.</small
           >
         </div>
 
         <div class="label">
           <label for="capacity"
-            >Розрядність лічильника <span class="indi-500">*</span></label
+            >{{ $translate.t("formCapacityCounter") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -302,18 +312,20 @@ export default defineComponent({
               invalid: !form.capacity.valid && form.capacity.touched,
             }"
           />
-          <small v-if="form.capacity.touched && form.capacity.errors.required"
-            >Будь-ласка введіть Розрядність лічильника</small
+          <small
+            v-if="form.capacity.touched && form.capacity.errors.required"
+            >{{ $translate.t("formErrorCapacityReq") }}</small
           >
           <small
             v-else-if="form.capacity.touched && form.capacity.errors.number"
-            >Розрядність лічильника повинна бути числом.</small
+            >{{ $translate.t("formErrorCapacityDigital") }}.</small
           >
         </div>
 
         <div class="label">
           <label for="build_date"
-            >Дата виробництва <span class="indi-500">*</span></label
+            >{{ $translate.t("formDateManufac") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -327,7 +339,8 @@ export default defineComponent({
 
         <div class="label">
           <label for="install_date"
-            >Дата встановлення <span class="indi-500">*</span></label
+            >{{ $translate.t("formDateInstall") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -340,7 +353,10 @@ export default defineComponent({
         </div>
 
         <div class="label">
-          <label for="arendator">Орендар <span class="indi-500">*</span></label>
+          <label for="arendator"
+            >{{ $translate.t("formTenant") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <select
@@ -353,7 +369,9 @@ export default defineComponent({
               invalid: !form.arendator.valid && form.arendator.touched,
             }"
           >
-            <option disabled selected value="">Виберіть орендатора</option>
+            <option disabled selected value="">
+              {{ $translate.t("formSelectTenant") }}
+            </option>
             <option
               v-for="a in arendators"
               :key="a.id"
@@ -363,13 +381,14 @@ export default defineComponent({
               {{ a.surname }} {{ a.name }}
             </option>
           </select>
-          <small v-if="form.arendator.touched && form.arendator.errors.required"
-            >Будь-ласка виберіть орендаря</small
+          <small
+            v-if="form.arendator.touched && form.arendator.errors.required"
+            >{{ $translate.t("formErrorTenantReq") }}</small
           >
         </div>
 
         <div class="label">
-          <label for="parent">№ батьківського лічильника: </label>
+          <label for="parent">{{ $translate.t("formParentCounter") }}: </label>
         </div>
         <div class="input-div">
           <input
@@ -384,12 +403,12 @@ export default defineComponent({
             }"
           />
           <small v-if="form.parent.touched && form.parent.errors.number"
-            >№ батьківського лічильника повинен бути числом.</small
+            >{{ $translate.t("formErrorParentCounterDigit") }}.</small
           >
         </div>
 
         <div class="label">
-          <label for="information">Додаткова інформація </label>
+          <label for="information">{{ $translate.t("info") }} </label>
         </div>
         <div class="input-div">
           <textarea
@@ -403,7 +422,7 @@ export default defineComponent({
         </div>
         <div class="add-footer">
           <button @click="$emit('cancel')" class="btn-tbl ff-500-14">
-            Скасувати
+            {{ $translate.t("cancel") }}
           </button>
           <button
             @click="addCounter"
@@ -411,7 +430,9 @@ export default defineComponent({
             class="btn-add ff-500-14"
           >
             {{
-              showUpdateCounter ? "Редагувати лічильник" : "Додати лічильник"
+              showUpdateCounter
+                ? $translate.t("formHeadCounterEdit")
+                : $translate.t("formHeadCounterAdd")
             }}
           </button>
         </div>

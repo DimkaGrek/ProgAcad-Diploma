@@ -72,11 +72,19 @@ export default {
               <span class="checkbox-custom"></span>
             </label>
           </th>
-          <th @click="selectedColumn = 'surname'">Фамілія</th>
-          <th @click="selectedColumn = 'name'">ИМ'Я</th>
-          <th @click="selectedColumn = 'phone1'">ТЕЛЕФОН</th>
-          <th @click="selectedColumn = 'notes'">ДОДАТКОВА ІНФО</th>
-          <th>Дії</th>
+          <th @click="selectedColumn = 'surname'">
+            {{ $translate.t("surnameUpper") }}
+          </th>
+          <th @click="selectedColumn = 'name'">
+            {{ $translate.t("nameUpper") }}
+          </th>
+          <th @click="selectedColumn = 'phone1'">
+            {{ $translate.t("phone1Upper") }}
+          </th>
+          <th @click="selectedColumn = 'notes'">
+            {{ $translate.t("infoUpper") }}
+          </th>
+          <th>{{ $translate.t("actionsUpper") }}</th>
         </tr>
       </thead>
       <tbody>

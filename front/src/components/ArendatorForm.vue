@@ -122,17 +122,19 @@ export default {
       <h1 class="ff-500-18">
         {{
           showUpdateArendator
-            ? "Редагувати арендатора"
-            : "Додати нового арендатора"
+            ? $translate.t("formHeadTenantEdit")
+            : $translate.t("formHeadTenantAdd")
         }}
       </h1>
-      <small>( * - обовя'зкові поля)</small>
+      <small>( * - {{ $translate.t("requiredFields") }})</small>
       <!-- showUpdateArendator: {{ props.showUpdateArendator }} -->
     </div>
     <div class="add-main ff-500-14">
       <form @submit.prevent="">
         <div class="label">
-          <label for="name">Им'я <span class="indi-500">*</span></label>
+          <label for="name"
+            >{{ $translate.t("name") }} <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -146,13 +148,16 @@ export default {
               invalid: !form.name.valid && form.name.touched,
             }"
           />
-          <small v-if="form.name.touched && form.name.errors.required"
-            >Будь-ласка введіть Им'я</small
-          >
+          <small v-if="form.name.touched && form.name.errors.required">{{
+            $translate.t("formErrorNameReq")
+          }}</small>
         </div>
 
         <div class="label">
-          <label for="surname">Фамілія <span class="indi-500">*</span></label>
+          <label for="surname"
+            >{{ $translate.t("surname") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -166,14 +171,15 @@ export default {
               invalid: !form.surname.valid && form.surname.touched,
             }"
           />
-          <small v-if="form.surname.touched && form.surname.errors.required"
-            >Будь-ласка введіть Фамілію</small
-          >
+          <small v-if="form.surname.touched && form.surname.errors.required">{{
+            $translate.t("formErrorSurnameReq")
+          }}</small>
         </div>
 
         <div class="label">
           <label for="evidence"
-            >Свідотство <span class="indi-500">*</span></label
+            >{{ $translate.t("certificate") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -188,13 +194,17 @@ export default {
               invalid: !form.evidence.valid && form.evidence.touched,
             }"
           />
-          <small v-if="form.evidence.touched && form.evidence.errors.required"
-            >Будь-ласка введіть Свідотство</small
+          <small
+            v-if="form.evidence.touched && form.evidence.errors.required"
+            >{{ $translate.t("formErrorCertificateReq") }}</small
           >
         </div>
 
         <div class="label">
-          <label for="passport">Паспорт <span class="indi-500">*</span></label>
+          <label for="passport"
+            >{{ $translate.t("passport") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -208,13 +218,17 @@ export default {
               invalid: !form.passport.valid && form.passport.touched,
             }"
           />
-          <small v-if="form.passport.touched && form.passport.errors.required"
-            >Будь-ласка введіть Паспорт</small
+          <small
+            v-if="form.passport.touched && form.passport.errors.required"
+            >{{ $translate.t("formErrorPassportReq") }}</small
           >
         </div>
 
         <div class="label">
-          <label for="address">Адреса <span class="indi-500">*</span></label>
+          <label for="address"
+            >{{ $translate.t("address") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -228,14 +242,15 @@ export default {
               invalid: !form.address.valid && form.address.touched,
             }"
           />
-          <small v-if="form.address.touched && form.address.errors.required"
-            >Будь-ласка введіть Адресу</small
-          >
+          <small v-if="form.address.touched && form.address.errors.required">{{
+            $translate.t("formErrorAddressReq")
+          }}</small>
         </div>
 
         <div class="label">
           <label for="typeCompany"
-            >Форма компаніі (Юр. або ФОП) <span class="indi-500">*</span></label
+            >{{ $translate.t("formCompany") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -252,12 +267,14 @@ export default {
           />
           <small
             v-if="form.typeCompany.touched && form.typeCompany.errors.required"
-            >Будь-ласка введіть Форму компаніі</small
+            >{{ $translate.t("formErrorFormCompanyReq") }}</small
           >
         </div>
 
         <div class="label">
-          <label for="phone1">Телефон 1 <span class="indi-500">*</span></label>
+          <label for="phone1"
+            >{{ $translate.t("phone1") }} <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -271,13 +288,13 @@ export default {
               invalid: !form.phone1.valid && form.phone1.touched,
             }"
           />
-          <small v-if="form.phone1.touched && form.phone1.errors.required"
-            >Будь-ласка введіть Телефон 1</small
-          >
+          <small v-if="form.phone1.touched && form.phone1.errors.required">{{
+            $translate.t("formErrorPhone1Req")
+          }}</small>
         </div>
 
         <div class="label">
-          <label for="phone2">Телефон 2 </label>
+          <label for="phone2">{{ $translate.t("phone2") }} </label>
         </div>
         <div class="input-div">
           <input
@@ -290,7 +307,9 @@ export default {
         </div>
 
         <div class="label">
-          <label for="email">E-mail <span class="indi-500">*</span></label>
+          <label for="email"
+            >{{ $translate.t("email") }} <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -303,7 +322,7 @@ export default {
         </div>
 
         <div class="label">
-          <label for="information">Додаткова інформація </label>
+          <label for="information">{{ $translate.t("info") }} </label>
         </div>
         <div class="input-div">
           <textarea
@@ -317,7 +336,7 @@ export default {
         </div>
         <div class="add-footer">
           <button @click="$emit('cancel')" class="btn-tbl ff-500-14">
-            Скасувати
+            {{ $translate.t("cancel") }}
           </button>
           <button
             @click="addArendator"
@@ -326,8 +345,8 @@ export default {
           >
             {{
               showUpdateArendator
-                ? "Редагувати арендатора"
-                : "Додати арендатора"
+                ? $translate.t("formHeadTenantEdit")
+                : $translate.t("formHeadTenantAdd")
             }}
           </button>
         </div>

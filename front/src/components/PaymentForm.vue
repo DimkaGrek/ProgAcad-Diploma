@@ -152,15 +152,18 @@ export default {
 <template>
   <div class="add-new">
     <div class="add-header">
-      <h1 v-if="isMassivePayment" class="ff-500-18">Здійснити масову оплату</h1>
-      <h1 v-else class="ff-500-18">Здійснити оплату</h1>
-      <small>( * - обовя'зкові поля)</small>
+      <h1 v-if="isMassivePayment" class="ff-500-18">
+        {{ $translate.t("makeMassivePayment") }}
+      </h1>
+      <h1 v-else class="ff-500-18">{{ $translate.t("makePayment") }}</h1>
+      <small>( * - {{ $translate.t("requiredFields") }})</small>
     </div>
     <div class="add-main ff-500-14">
       <form @submit.prevent="">
         <div class="label">
           <label for="receiptId"
-            >Номер чека про оплату <span class="indi-500">*</span></label
+            >{{ $translate.t("formPaymentReceiptNum") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -175,18 +178,20 @@ export default {
               invalid: !form.receiptId.valid && form.receiptId.touched,
             }"
           />
-          <small v-if="form.receiptId.touched && form.receiptId.errors.required"
-            >Будь-ласка введіть Номер чека про оплату</small
+          <small
+            v-if="form.receiptId.touched && form.receiptId.errors.required"
+            >{{ $translate.t("formErrorPayRecNumReq") }}</small
           >
           <small
             v-else-if="form.receiptId.touched && form.receiptId.errors.number"
-            >Номер чека про оплату повинен бути числом.</small
+            >{{ $translate.t("formErrorPayRecIsNum") }}.</small
           >
         </div>
 
         <div class="label">
           <label for="amount"
-            >Сума оплати <span class="indi-500">*</span></label
+            >{{ $translate.t("formPaymentAmount") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -201,15 +206,17 @@ export default {
               invalid: !form.amount.valid && form.amount.touched,
             }"
           />
-          <small v-if="form.amount.touched && form.amount.errors.required"
-            >Будь-ласка введіть Суму оплати</small
-          >
+          <small v-if="form.amount.touched && form.amount.errors.required">{{
+            $translate.t("formErrorPayAmountReq")
+          }}</small>
           <small v-else-if="form.amount.touched && form.amount.errors.number"
-            >Сума оплати повинна бути числом.</small
+            >{{ $translate.t("formErrorPayAmountNum") }}.</small
           >
         </div>
 
-        <div class="label"><label for="date">Дата </label></div>
+        <div class="label">
+          <label for="date">{{ $translate.t("formDate") }} </label>
+        </div>
         <div class="input-div">
           <input
             v-model="form.date.value"
@@ -220,7 +227,7 @@ export default {
         </div>
 
         <div class="label">
-          <label for="information">Додаткова інформація: </label>
+          <label for="information">{{ $translate.t("info") }}: </label>
         </div>
         <div class="input-div">
           <textarea
@@ -234,7 +241,7 @@ export default {
         </div>
         <div class="add-footer">
           <button @click="$emit('cancel')" class="btn-tbl ff-500-14">
-            Скасувати
+            {{ $translate.t("cancel") }}
           </button>
           <button
             :disabled="!form.valid"
@@ -242,7 +249,9 @@ export default {
             class="btn-add ff-500-14"
           >
             {{
-              isMassivePayment ? "Здійснити масову оплату" : "Здійснити оплату"
+              isMassivePayment
+                ? $translate.t("makeMassivePayment")
+                : $translate.t("makePayment")
             }}
           </button>
         </div>

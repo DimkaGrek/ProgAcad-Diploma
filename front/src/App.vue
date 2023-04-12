@@ -1,6 +1,6 @@
 <script>
-import { ref, onMounted, watch } from "vue";
-import HomeView from "../src/pages/HomeView.vue";
+import { ref, onMounted, watch, inject } from "vue";
+import DocView from "./components/DocView.vue";
 import TopNav from "./components/TopNav.vue";
 import CountersTable from "./components/CountersTable.vue";
 import CalculationTable from "./components/CalculationTable.vue";
@@ -13,7 +13,7 @@ import ArendatorForm from "./components/ArendatorForm.vue";
 
 export default {
   components: {
-    HomeView,
+    DocView,
     TopNav,
     CountersTable,
     CalculationTable,
@@ -26,6 +26,7 @@ export default {
   },
   setup() {
     const username = ref(null);
+    const globalState = inject("$globalState");
     const loading = ref(true);
 
     const show = ref(false);
@@ -71,6 +72,9 @@ export default {
     const selectedCalcsForPayment = ref([]); // для выбраных квитанций для оплаты
 
     const searchQuery = ref("");
+    const clearSearch = () => {
+      searchQuery.value = "";
+    };
     const selectedCounter = ref(null);
     const selectedCounterForUpdate = ref();
 
@@ -432,6 +436,7 @@ export default {
         });
         const userData = await response.json();
         username.value = userData.username;
+        globalState.setUsername(username.value);
         fetchCounters();
         showCounters.value = true;
       } catch (error) {
@@ -569,6 +574,7 @@ export default {
       showUpdateArendator,
       selectedArendatorForUpdate,
       selectUpdateArendator,
+      clearSearch,
     };
   },
 };
@@ -580,7 +586,6 @@ export default {
   {{ lastCalc }} <br />
   numberOfDeletedCounters: {{ numberOfDeletedCounters }} isCheckedForPayment:
   {{ isCheckedForPayment }} -->
-
   <div v-if="username">
     <my-dialog v-model:show="show" @close-dialog="show = false">
       <counter-form
@@ -626,36 +631,69 @@ export default {
       <div class="container">
         <div class="menu-space"></div>
         <div class="menu">
-          <button @click="clickCounters" class="btn-menu white ff-500-18">
-            Лічильники
-          </button>
-          <button @click="clickArendators" class="btn-menu white ff-500-18">
-            Арендатори
-          </button>
-          <button @click="clickHome" class="btn-menu white ff-500-18">
-            Опис
-          </button>
-          <!-- <button class="btn-menu ff-500-18">Послуги</button>
-          <button class="btn-menu ff-500-18">Аналітика</button> -->
-          <!-- <RouterLink to="/">
-            <button class="btn-menu white ff-500-18">Опис</button>
-          </RouterLink>
-          <RouterLink to="/counters" @click="clickCounters">
-            <button class="btn-menu white ff-500-18">Лічильники</button>
-          </RouterLink>
-          <RouterLink to="/arendators">
-            <button class="btn-menu white ff-500-18">Арендатори</button>
-          </RouterLink>
-          <button class="btn-menu ff-500-18">Послуги</button>
-          <button class="btn-menu ff-500-18">Аналітика</button>-->
-          <div>
-            Username: {{ username }}
-            <span class="link-text indi" @click="logout">Разлогиниться</span>
+          <div class="menu-left">
+            <button
+              @click="
+                clearSearch();
+                clickCounters();
+              "
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': showCounters }"
+            >
+              {{ $translate.t("btnCounters") }}
+            </button>
+            <button
+              @click="
+                clearSearch();
+                clickArendators();
+              "
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': showArendators }"
+            >
+              {{ $translate.t("btnTenants") }}
+            </button>
+            <button
+              @click="
+                clearSearch();
+                clickHome();
+              "
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': showHome }"
+            >
+              {{ $translate.t("btnDocum") }}
+            </button>
+            <div>
+              Username: {{ username }}
+              <span class="link-text indi" @click="logout">Разлогиниться</span>
+            </div>
+          </div>
+          <div class="menu-right">
+            <button
+              @click="$translate.setLocale('ua')"
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': $translate.state.locale === 'ua' }"
+            >
+              Ua
+            </button>
+            <button
+              @click="$translate.setLocale('en')"
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': $translate.state.locale === 'en' }"
+            >
+              En
+            </button>
+            <button
+              @click="$translate.setLocale('ru')"
+              class="btn-menu white ff-500-18"
+              :class="{ 'btn-active': $translate.state.locale === 'ru' }"
+            >
+              Ru
+            </button>
           </div>
         </div>
       </div>
     </header>
-    <HomeView v-if="showHome"></HomeView>
+    <DocView v-if="showHome"></DocView>
     <div v-else class="container">
       <div class="sidebar">
         <div><img src="./components/icons/logo.svg" alt="logo" /></div>
@@ -670,21 +708,21 @@ export default {
               }
             }
           "
-          @mouseenter="showMessageFunction($event, 'Сплатити')"
+          @mouseenter="showMessageFunction($event, $translate.t('btnPayment'))"
           @mouseleave="showMessage = false"
         >
           <img src="./components/icons/money.svg" alt="payment" />
         </button>
         <button
           @click="callPrintCalculationsFromParent"
-          @mouseenter="showMessageFunction($event, 'Роздрукувати')"
+          @mouseenter="showMessageFunction($event, $translate.t('btnPrint'))"
           @mouseleave="showMessage = false"
         >
           <img src="./components/icons/printer.svg" alt="printer" />
         </button>
         <button
           @click="callDelete"
-          @mouseenter="showMessageFunction($event, 'Видалити')"
+          @mouseenter="showMessageFunction($event, $translate.t('btnDelete'))"
           @mouseleave="showMessage = false"
         >
           <img src="./components/icons/ben.svg" alt="ben" />
@@ -779,5 +817,10 @@ export default {
 }
 .message-text {
   color: #b9b6fa;
+}
+.btn-active {
+  background: #4945c4;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px #5e5adb,
+    0px 0px 0px 4px rgba(94, 90, 219, 0.4);
 }
 </style>

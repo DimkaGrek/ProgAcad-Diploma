@@ -203,10 +203,12 @@ export default {
     <div class="add-header">
       <h1 class="ff-500-18">
         {{
-          props.showUpdateCalc ? "Редагувати нарахування" : "Додати нарахування"
+          props.showUpdateCalc
+            ? $translate.t("formHeadAccrualEdit")
+            : $translate.t("formHeadAccrualAdd")
         }}
       </h1>
-      <small>( * - обовя'зкові поля)</small>
+      <small>( * - {{ $translate.t("requiredFields") }})</small>
     </div>
     <div class="add-main ff-500-14">
       <form @submit.prevent="">
@@ -214,7 +216,8 @@ export default {
           <div class="add-month">
             <div class="label">
               <label for="month"
-                >За місяць <span class="indi-500">*</span></label
+                >{{ $translate.t("formForMonth") }}
+                <span class="indi-500">*</span></label
               >
             </div>
             <div class="input-div">
@@ -224,7 +227,9 @@ export default {
                 name="month"
                 class="ff-500-14"
               >
-                <option disabled value="">Виберіть місяць</option>
+                <option disabled value="">
+                  {{ $translate.t("formSelectMonth") }}
+                </option>
                 <option
                   v-for="m in month"
                   :key="m"
@@ -237,14 +242,17 @@ export default {
                   {{ m }}
                 </option>
               </select>
-              <small v-if="form.month.touched && form.month.errors.required"
-                >Будь-ласка виберіть місяць</small
-              >
+              <small v-if="form.month.touched && form.month.errors.required">{{
+                $translate.t("formErrorMonthReq")
+              }}</small>
             </div>
           </div>
           <div class="add-year">
             <div class="label">
-              <label for="year">рік <span class="indi-500">*</span></label>
+              <label for="year"
+                >{{ $translate.t("formYear") }}
+                <span class="indi-500">*</span></label
+              >
             </div>
             <div class="input-div">
               <select
@@ -252,7 +260,9 @@ export default {
                 name="year"
                 class="ff-500-14 input"
               >
-                <option disabled value="">Виберіть рік</option>
+                <option disabled value="">
+                  {{ $translate.t("formSelectYear") }}
+                </option>
                 <option
                   v-for="y in year"
                   :key="y"
@@ -268,7 +278,8 @@ export default {
 
         <div class="label">
           <label for="countnow"
-            >Поточні показники <span class="indi-500">*</span></label
+            >{{ $translate.t("formCurrReadings") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -283,18 +294,20 @@ export default {
               invalid: !form.countNow.valid && form.countNow.touched,
             }"
           />
-          <small v-if="form.countNow.touched && form.countNow.errors.required"
-            >Будь-ласка введіть Поточні показники</small
+          <small
+            v-if="form.countNow.touched && form.countNow.errors.required"
+            >{{ $translate.t("formErrorCurrReadReq") }}</small
           >
           <small
             v-else-if="form.countNow.touched && form.countNow.errors.number"
-            >Поточні показники повинені бути числом.</small
+            >{{ $translate.t("formErrorCurrReadNum") }}.</small
           >
         </div>
 
         <div class="label">
           <label for="countbefore"
-            >Попередні показники <span class="indi-500">*</span></label
+            >{{ $translate.t("formPrevReadings") }}
+            <span class="indi-500">*</span></label
           >
         </div>
         <div class="input-div">
@@ -311,18 +324,21 @@ export default {
           />
           <small
             v-if="form.countBefore.touched && form.countBefore.errors.required"
-            >Будь-ласка введіть Попередні показники</small
+            >{{ $translate.t("formErrorPrevReadReq") }}</small
           >
           <small
             v-else-if="
               form.countBefore.touched && form.countBefore.errors.number
             "
-            >Попередні показники повинені бути числом.</small
+            >{{ $translate.t("formErrorPrevReadNum") }}.</small
           >
         </div>
 
         <div class="label">
-          <label for="rate">Тариф <span class="indi-500">*</span></label>
+          <label for="rate"
+            >{{ $translate.t("formRate") }}
+            <span class="indi-500">*</span></label
+          >
         </div>
         <div class="input-div">
           <input
@@ -336,15 +352,17 @@ export default {
               invalid: !form.rate.valid && form.rate.touched,
             }"
           />
-          <small v-if="form.rate.touched && form.rate.errors.required"
-            >Будь-ласка введіть Тариф</small
-          >
+          <small v-if="form.rate.touched && form.rate.errors.required">{{
+            $translate.t("formErrorRateReq")
+          }}</small>
           <small v-else-if="form.rate.touched && form.rate.errors.number"
-            >Тариф повинен бути числом.</small
+            >{{ $translate.t("formErrorRateNum") }}.</small
           >
         </div>
 
-        <div class="label"><label for="dateinput">Дата </label></div>
+        <div class="label">
+          <label for="dateinput">{{ $translate.t("formDate") }} </label>
+        </div>
         <div class="input-div">
           <input
             v-model="form.date.value"
@@ -355,7 +373,7 @@ export default {
         </div>
 
         <div class="label">
-          <label for="information">Додаткова інформація: </label>
+          <label for="information">{{ $translate.t("info") }}: </label>
         </div>
         <div class="input-div">
           <textarea
@@ -369,7 +387,7 @@ export default {
         </div>
         <div class="add-footer">
           <button @click="$emit('cancel')" class="btn-tbl ff-500-14">
-            Скасувати
+            {{ $translate.t("cancel") }}
           </button>
           <button
             :disabled="!form.valid"
@@ -378,8 +396,8 @@ export default {
           >
             {{
               props.showUpdateCalc
-                ? "Редагувати нарахування"
-                : "Додати нарахування"
+                ? $translate.t("formHeadAccrualEdit")
+                : $translate.t("formHeadAccrualAdd")
             }}
           </button>
         </div>

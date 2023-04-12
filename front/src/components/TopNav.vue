@@ -1,7 +1,11 @@
 <script>
 import { computed, ref } from "vue";
+import UserDropdown from "./UserDropdown.vue";
 
 export default {
+  components: {
+    UserDropdown,
+  },
   props: [
     "totalCounters",
     "showCounters",
@@ -53,38 +57,41 @@ export default {
   <div class="topnav">
     <div class="topnav-title">
       <template v-if="showCounters">
-        <h2>Лічильники</h2>
+        <h2>{{ $translate.t("titleCounters") }}</h2>
         <div class="count indi">
           {{ totalCounters }}
         </div>
       </template>
       <template v-if="showArendators">
-        <h2>Орендатори</h2>
+        <h2>{{ $translate.t("titleTenants") }}</h2>
         <div class="count indi">
           {{ totalArendators }}
         </div>
       </template>
       <template v-if="showCalc">
         <h2>
-          Счетчик: <span class="indi">{{ counterData.number }}</span>
+          {{ $translate.t("counter") }}:
+          <span class="indi">{{ counterData.number }}</span>
         </h2>
         <h3>
-          № Павильона: <span class="indi">{{ counterData.pavilion }}</span>
+          {{ $translate.t("formPavilion") }}:
+          <span class="indi">{{ counterData.pavilion }}</span>
         </h3>
         <h3>
-          № Места: <span class="indi">{{ counterData.place }}</span>
+          {{ $translate.t("formPlace") }}:
+          <span class="indi">{{ counterData.place }}</span>
         </h3>
       </template>
     </div>
     <div class="topnav-right">
-      <img
+      <!-- <img
         src="./icons/notify_icon.png"
         alt="notify_icon"
         width="24"
         height="24"
       />
-      <img src="./icons/help_icon.png" alt="help_icon" width="24" height="24" />
-      <img src="./icons/user_icon.png" alt="user_icon" width="32" height="32" />
+      <img src="./icons/help_icon.png" alt="help_icon" width="24" height="24" /> -->
+      <user-dropdown />
     </div>
   </div>
   <div class="infobar">
@@ -102,7 +109,7 @@ export default {
               height="16"
             />
             <select name="select" id="">
-              <option value="all">All</option>
+              <option value="all">{{ $translate.t("all") }}</option>
             </select>
           </div>
           <div class="search-input">
@@ -135,21 +142,21 @@ export default {
         @click="$emit('showModal')"
         class="btn-add ff-500-14"
       >
-        + Додати лічильник
+        + {{ $translate.t("btnAddCounter") }}
       </button>
       <button
         v-if="showArendators"
         @click="$emit('showArendForm')"
         class="btn-add ff-500-14"
       >
-        + Додати орендатора
+        + {{ $translate.t("btnAddTenant") }}
       </button>
       <button
         v-if="showCalc"
         @click="$emit('show-calc-form', counterId)"
         class="btn-add ff-500-14"
       >
-        + Додати розрахунок
+        + {{ $translate.t("btnAddAccrual") }}
       </button>
     </div>
   </div>
@@ -158,15 +165,21 @@ export default {
     <div class="info-item">
       <div class="info-item-top">
         <template v-if="showCounters">
-          <div class="info-text"><a href="">Усі</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("all") }}</a>
+          </div>
           <div class="count indi">{{ totalCounters }}</div>
         </template>
         <template v-if="showArendators">
-          <div class="info-text"><a href="">Усі</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("all") }}</a>
+          </div>
           <div class="count indi">{{ totalArendators }}</div>
         </template>
         <template v-if="showCalc">
-          <div class="info-text"><a href="">Всього нараховано</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("totalCalculated") }}</a>
+          </div>
           <div class="count indi-500">{{ totalCalc }}</div>
         </template>
       </div>
@@ -175,11 +188,15 @@ export default {
     <div class="info-item">
       <div class="info-item-top">
         <template v-if="showCounters">
-          <div class="info-text"><a href="">Общие</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("common") }}</a>
+          </div>
           <div class="count indi">5</div>
         </template>
         <template v-if="showCalc">
-          <div class="info-text"><a href="">Усього оплачено</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("totalPay") }}</a>
+          </div>
           <div class="count indi-500">{{ totalPay }}</div>
         </template>
       </div>
@@ -188,13 +205,17 @@ export default {
     <div class="info-item">
       <div class="info-item-top">
         <template v-if="showCounters">
-          <div class="info-text"><a href="">Неактивные</a></div>
+          <div class="info-text">
+            <a href="">{{ $translate.t("inactive") }}</a>
+          </div>
           <div class="count indi">{{ numberOfDeletedCounters }}</div>
         </template>
         <template v-if="showCalc && debtPayment !== 0">
           <div class="info-text">
-            <span v-if="debtPayment > 0" class="indi">Борг</span>
-            <span v-else class="indi">Переплата</span>
+            <span v-if="debtPayment > 0" class="indi">{{
+              $translate.t("debt")
+            }}</span>
+            <span v-else class="indi">{{ $translate.t("overpayment") }}</span>
           </div>
           <div v-if="debtPayment > 0" class="count red">
             {{ debtPayment.toFixed(2) }}

@@ -14,16 +14,18 @@ export default {
 <template>
   <div class="pop-up">
     <div class="add-header">
-      <h1 class="ff-500-18">Оплати за {{ calcMonth }}</h1>
+      <h1 class="ff-500-18">
+        {{ $translate.t("PaymentsFor") }} {{ calcMonth }}
+      </h1>
     </div>
     <div class="pop-up-content">
       <table>
         <thead>
           <tr class="no-wrap">
-            <th>Дата</th>
-            <th>Номер чека</th>
-            <th>Сума</th>
-            <th>Примітки</th>
+            <th>{{ $translate.t("tableDateUpper") }}</th>
+            <th>{{ $translate.t("formReceiptNumberUpper") }}</th>
+            <th>{{ $translate.t("tableAmountUpper") }}</th>
+            <th>{{ $translate.t("infoUpper") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +40,7 @@ export default {
     </div>
     <div class="add-footer close">
       <button @click="$emit('cancel')" class="btn-tbl ff-500-14">
-        Закрити
+        {{ $translate.t("close") }}
       </button>
     </div>
   </div>

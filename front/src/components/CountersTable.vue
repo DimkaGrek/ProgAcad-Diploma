@@ -134,13 +134,13 @@ export default defineComponent({
   selectedCounterId: {{ selectedCounterId }} -->
   <div class="table-scroll">
     <div v-if="showAttentionMessage" class="attention">
-      <h1 class="ff-500-18">Ви впевнені ?</h1>
+      <h1 class="ff-500-18">{{ $translate.t("areYouSure") }}</h1>
       <div class="add-footer">
         <button @click="showAttentionMessage = false" class="btn-tbl ff-500-14">
-          Закрити
+          {{ $translate.t("close") }}
         </button>
         <button @click="deleteCounters" class="btn-tbl ff-500-14">
-          Підтвердити
+          {{ $translate.t("confirm") }}
         </button>
       </div>
     </div>
@@ -158,13 +158,23 @@ export default defineComponent({
               <span class="checkbox-custom"></span>
             </label>
           </th>
-          <th @click="selectedColumn = 'pavilion'">№ ПАВИЛЬОНА</th>
-          <th @click="selectedColumn = 'place'">№ МЕСТА</th>
-          <th @click="selectedColumn = 'number'">№ СЧЕТЧИКА</th>
-          <th @click="selectedColumn = 'surname'">ФАМИЛИЯ</th>
-          <th @click="selectedColumn = 'name'">ИМЯ</th>
-          <th>ПРИМЕЧАНИЯ</th>
-          <th>ОПЛАТА</th>
+          <th @click="selectedColumn = 'pavilion'">
+            {{ $translate.t("tablePavilionUpper") }}
+          </th>
+          <th @click="selectedColumn = 'place'">
+            {{ $translate.t("tablePlaceUpper") }}
+          </th>
+          <th @click="selectedColumn = 'number'">
+            {{ $translate.t("tableCounterUpper") }}
+          </th>
+          <th @click="selectedColumn = 'surname'">
+            {{ $translate.t("surnameUpper") }}
+          </th>
+          <th @click="selectedColumn = 'name'">
+            {{ $translate.t("nameUpper") }}
+          </th>
+          <th>{{ $translate.t("infoUpper") }}</th>
+          <th>{{ $translate.t("tablePaymentUpper") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -226,7 +236,7 @@ export default defineComponent({
                 class="menu-text indi ff-500-14"
                 @click="selectCounter(c.id, c.number, c.pavilion, c.place)"
               >
-                Нарахування
+                {{ $translate.t("accruals") }}
               </div>
               <div
                 @click="
@@ -234,7 +244,7 @@ export default defineComponent({
                 "
                 class="menu-text brown ff-500-14"
               >
-                Редагувати
+                {{ $translate.t("edit") }}
               </div>
               <div
                 @click="
@@ -242,7 +252,7 @@ export default defineComponent({
                 "
                 class="menu-text red ff-500-14"
               >
-                Видалити
+                {{ $translate.t("delete") }}
               </div>
             </div>
           </tr>
