@@ -44,10 +44,11 @@ export default {
     });
 
     const totalPay = computed(() => {
-      return (
-        props.totalPayAmount && parseFloat(props.totalPayAmount).toFixed(2)
-      );
+      return props.totalPayAmount && props.totalPayAmount.toFixed(2);
     });
+
+    console.log("totalCalc: ", totalCalc.value);
+    console.log("totalPay: ", totalPay.value);
     return {
       debtPayment,
       totalCalc,

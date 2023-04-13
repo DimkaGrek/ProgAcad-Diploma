@@ -393,6 +393,9 @@ export default {
         totalPayAmount.value = await fetch(
           "api/payments/sum/" + counterId
         ).then((response) => response.text());
+        totalPayAmount.value === ""
+          ? (totalPayAmount.value = 0)
+          : (totalPayAmount.value = parseFloat(totalPayAmount.value));
         console.log("totalPayAmount", totalPayAmount.value);
         loading.value = false;
       } catch (error) {
