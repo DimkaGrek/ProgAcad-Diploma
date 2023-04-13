@@ -14,6 +14,7 @@ export default defineComponent({
     //   props.selectedCounterData.pavilion
     // );
     console.log("showUpdateCounter: ", props.showUpdateCounter);
+    console.log("selectedCounterData: ", props.selectedCounterData);
     const state = reactive({
       submit: false,
       existCounter: false,
@@ -78,7 +79,7 @@ export default defineComponent({
       },
       capacity: {
         value: props.showUpdateCounter
-          ? props.selectedCounterData.capacity
+          ? props.selectedCounterData.atomicity
           : "",
         validators: { required, number },
       },
