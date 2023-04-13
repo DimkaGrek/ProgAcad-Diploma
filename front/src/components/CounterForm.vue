@@ -1,6 +1,6 @@
 <script>
 import { useForm } from "../hooks/form";
-import { reactive, defineComponent, ref, onMounted, watch } from "vue";
+import { reactive, defineComponent, ref, onMounted, watch, inject } from "vue";
 
 const required = (val) => !!val;
 const minLength = (num) => (val) => val.length >= num;
@@ -18,6 +18,8 @@ export default defineComponent({
       submit: false,
       existCounter: false,
     });
+
+    const clearSearch = inject("clearSearch");
 
     const arendators = ref([]);
     const arendator = ref(null);
@@ -143,6 +145,7 @@ export default defineComponent({
             //response.json()
             console.log("СЧЕТЧИК СОХРАНЕН");
             alert("Данні збережені успішно!");
+            clearSearch();
             emit("submitForm");
           } else {
             // Обработка ошибки
@@ -170,6 +173,7 @@ export default defineComponent({
       arendators,
       arendator,
       isArendatorsLoaded,
+      clearSearch,
     };
   },
 });

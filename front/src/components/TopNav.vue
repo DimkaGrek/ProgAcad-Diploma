@@ -1,5 +1,5 @@
 <script>
-import { computed, ref } from "vue";
+import { computed, inject } from "vue";
 import UserDropdown from "./UserDropdown.vue";
 
 export default {
@@ -19,7 +19,7 @@ export default {
     "showArendators",
     "totalArendators",
   ],
-  emits: ["searchChange", "showModal", "show-calc-form", "showArendForm"],
+  emits: ["showModal", "show-calc-form", "showArendForm"],
   setup(props) {
     console.log("props totalCounters: ", props.totalCounters);
     console.log("props showCounters: ", props.showCounters);
@@ -28,7 +28,8 @@ export default {
     console.log("props totalPayAmount: ", props.totalPayAmount);
     console.log("props counterData: ", props.counterData);
 
-    const localSearch = ref();
+    const searchQuery = inject("searchQuery");
+    const clearSearch = inject("clearSearch");
 
     // debtPayment.value = props.totalCalcAmount - props.totalPayAmount;
     const debtPayment = computed(() => {
@@ -47,7 +48,13 @@ export default {
         props.totalPayAmount && parseFloat(props.totalPayAmount).toFixed(2)
       );
     });
-    return { localSearch, debtPayment, totalCalc, totalPay };
+    return {
+      debtPayment,
+      totalCalc,
+      totalPay,
+      searchQuery,
+      clearSearch,
+    };
   },
 };
 </script>
@@ -120,8 +127,7 @@ export default {
               height="16"
             />
             <input
-              v-model="localSearch"
-              @input="$emit('searchChange', localSearch)"
+              v-model="searchQuery"
               type="text"
               name="search"
               id=""

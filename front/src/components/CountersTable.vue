@@ -1,8 +1,15 @@
 <script>
-import { defineComponent, ref, computed, onMounted, onUnmounted } from "vue";
+import {
+  defineComponent,
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  inject,
+} from "vue";
 
 export default defineComponent({
-  props: ["counters", "searchQuery", "show"],
+  props: ["counters", "show"],
   emits: [
     "select-counter",
     "selectUpdateCounter",
@@ -14,6 +21,9 @@ export default defineComponent({
     const selectedColumn = ref("");
     const selectedCounterId = ref(null);
     const showAttentionMessage = ref(false); // показать окно предупреждения
+
+    const searchQuery = inject("searchQuery");
+    const clearSearch = inject("clearSearch");
 
     const menuTop = ref(0);
     const menuLeft = ref(0);
@@ -53,15 +63,15 @@ export default defineComponent({
         (counter) =>
           counter.pavilion
             .toLowerCase()
-            .includes(props.searchQuery.toLowerCase()) ||
+            .includes(searchQuery.value.toLowerCase()) ||
           counter.place
             .toLowerCase()
-            .includes(props.searchQuery.toLowerCase()) ||
-          String(counter.number).includes(props.searchQuery) ||
+            .includes(searchQuery.value.toLowerCase()) ||
+          String(counter.number).includes(searchQuery.value) ||
           counter.surname
             .toLowerCase()
-            .includes(props.searchQuery.toLowerCase()) ||
-          counter.name.toLowerCase().includes(props.searchQuery.toLowerCase())
+            .includes(searchQuery.value.toLowerCase()) ||
+          counter.name.toLowerCase().includes(searchQuery.value.toLowerCase())
       );
     });
 
@@ -123,6 +133,8 @@ export default defineComponent({
       callDeleteCounters,
       showAttentionMessage,
       deleteCounters,
+      searchQuery,
+      clearSearch,
       props,
     };
   },
@@ -209,7 +221,10 @@ export default defineComponent({
             >
               <span
                 class="link-text indi"
-                @click="selectCounter(c.id, c.number, c.pavilion, c.place)"
+                @click="
+                  clearSearch();
+                  selectCounter(c.id, c.number, c.pavilion, c.place);
+                "
                 >{{ c.number }}</span
               >
             </td>
@@ -234,7 +249,10 @@ export default defineComponent({
             >
               <div
                 class="menu-text indi ff-500-14"
-                @click="selectCounter(c.id, c.number, c.pavilion, c.place)"
+                @click="
+                  clearSearch();
+                  selectCounter(c.id, c.number, c.pavilion, c.place);
+                "
               >
                 {{ $translate.t("accruals") }}
               </div>

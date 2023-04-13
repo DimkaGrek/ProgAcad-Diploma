@@ -1,6 +1,6 @@
 <script>
 import moment from "moment";
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, inject } from "vue";
 
 import pdfMake, { initPdfMake } from "@/pdfmake.client";
 // import pdfMake from "pdfmake/build/pdfmake";
@@ -16,7 +16,6 @@ export default {
     "calcRecords",
     "counterId",
     "show",
-    "searchQuery",
     "totalCalcAmount",
     "totalPayAmount",
     "counterData",
@@ -45,6 +44,9 @@ export default {
     const formatDate = (date) => {
       return moment(date).format("DD.MM.YYYY");
     };
+
+    const searchQuery = inject("searchQuery");
+    const clearSearch = inject("clearSearch");
 
     function toggleSelectionAll(event) {
       if (event.target.checked) {
@@ -455,17 +457,17 @@ export default {
           (calc) =>
             calc.month
               .toLowerCase()
-              .includes(props.searchQuery.toLowerCase()) ||
+              .includes(searchQuery.value.toLowerCase()) ||
             formatDate(calc.date)
               .toLowerCase()
-              .includes(props.searchQuery.toLowerCase()) ||
-            String(calc.countNow).includes(props.searchQuery) ||
-            String(calc.countBefore).includes(props.searchQuery) ||
-            String(calc.difference).includes(props.searchQuery) ||
-            String(calc.rate).includes(props.searchQuery) ||
-            String(calc.amount).includes(props.searchQuery) ||
-            calc.name.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-            calc.surname.toLowerCase().includes(props.searchQuery.toLowerCase())
+              .includes(searchQuery.value.toLowerCase()) ||
+            String(calc.countNow).includes(searchQuery.value) ||
+            String(calc.countBefore).includes(searchQuery.value) ||
+            String(calc.difference).includes(searchQuery.value) ||
+            String(calc.rate).includes(searchQuery.value) ||
+            String(calc.amount).includes(searchQuery.value) ||
+            calc.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            calc.surname.toLowerCase().includes(searchQuery.value.toLowerCase())
         )
         .reverse();
     });
@@ -493,6 +495,8 @@ export default {
       pdfIframe,
       printPDF,
       savePDF,
+      searchQuery,
+      clearSearch,
       props,
     };
   },

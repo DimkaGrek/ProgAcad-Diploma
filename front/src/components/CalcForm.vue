@@ -1,5 +1,5 @@
 <script>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { useForm } from "../hooks/form";
 
 const required = (val) => !!val;
@@ -67,6 +67,9 @@ export default {
 
     const countNow = props.lastCalc ? props.lastCalc.countNow : null;
     const rate = props.lastCalc ? props.lastCalc.rate : null;
+
+    const searchQuery = inject("searchQuery");
+    const clearSearch = inject("clearSearch");
 
     // if (props.lastCalc !== null) {
     //   countNow.value = props.lastCalc.countNow;
@@ -193,6 +196,8 @@ export default {
       hours,
       minutes,
       addCalc,
+      searchQuery,
+      clearSearch,
     };
   },
 };
@@ -391,7 +396,10 @@ export default {
           </button>
           <button
             :disabled="!form.valid"
-            @click="addCalc"
+            @click="
+              clearSearch();
+              addCalc();
+            "
             class="btn-add ff-500-14"
           >
             {{

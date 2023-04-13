@@ -1,5 +1,5 @@
 <script>
-import { ref, onMounted, watch, inject } from "vue";
+import { ref, onMounted, watch, inject, provide } from "vue";
 import DocView from "./components/DocView.vue";
 import TopNav from "./components/TopNav.vue";
 import CountersTable from "./components/CountersTable.vue";
@@ -75,12 +75,11 @@ export default {
     const clearSearch = () => {
       searchQuery.value = "";
     };
+    provide("searchQuery", searchQuery);
+    provide("clearSearch", clearSearch);
+
     const selectedCounter = ref(null);
     const selectedCounterForUpdate = ref();
-
-    const handleSearchChange = (value) => {
-      searchQuery.value = value;
-    };
 
     const MassivePayment = ref(null);
     const PrintCalculations = ref(null);
@@ -515,7 +514,6 @@ export default {
       selectCounter,
       counters,
       totalCounters,
-      handleSearchChange,
       calcRecords,
       totalCalcRecords,
       loading,
@@ -739,7 +737,6 @@ export default {
         <div v-if="loading" class="loading"></div>
         <TopNav
           v-if="!loading"
-          @searchChange="handleSearchChange"
           :totalCounters="totalCounters"
           :showCounters="showCounters"
           :showArendators="showArendators"
@@ -758,7 +755,6 @@ export default {
         <CountersTable
           v-if="showCounters && !loading"
           :counters="counters"
-          :searchQuery="searchQuery"
           :show="show"
           @select-counter="selectCounter"
           @selectUpdateCounter="selectUpdateCounter"
@@ -775,7 +771,6 @@ export default {
           @registerPrintCalculations="onRegisterPrintCalculations"
           @registerDeleteCalculations="onRegisterDeleteCalculations"
           :show="show"
-          :searchQuery="searchQuery"
           :calcRecords="calcRecords"
           :counterId="selectedCounter"
           :counterData="selectedCounterData"
@@ -798,7 +793,12 @@ export default {
       </div>
     </div>
   </div>
-  <div v-else>Input login and password {{ username }}</div>
+  <div v-else class="loginPassword">
+    <div class="arrow"></div>
+    <div class="loginText">
+      Please, input login and password in the pop-up menu
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -818,5 +818,40 @@ export default {
   background: #4945c4;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px #5e5adb,
     0px 0px 0px 4px rgba(94, 90, 219, 0.4);
+}
+.loginPassword {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  /* margin: 0 auto; */
+  /* text-align: center; */
+  height: 400px;
+}
+@keyframes arrowAnimation {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid black;
+  animation: arrowAnimation 1s infinite;
+}
+.loginText {
+  margin-top: 10px;
+  font-family: "Inter", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 30px;
 }
 </style>
