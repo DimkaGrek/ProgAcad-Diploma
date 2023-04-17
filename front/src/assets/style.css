@@ -1,3 +1,8 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 body {
     background: linear-gradient(#4E4AE2, #4B88E3) no-repeat; 
 }
@@ -208,7 +213,7 @@ a.white{
     display: flex;
     /* border: 1px solid #fff; */
     margin: auto;
-    width: 1440px;
+    max-width: 1440px;
 }
 .sidebar{
     display: flex;
