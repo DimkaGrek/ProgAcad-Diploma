@@ -67,6 +67,8 @@ export default {
     const lastCalc = ref(); // последняя квитанция по счетчику
     const calcForUpdate = ref(); // квитанция для редактирования
     const selectedAmount = ref(); // выбранная сумма для оплаты
+    const selectedOverpayment = ref(0); // переплата по начислениям
+    const selectedCalcOverpayment = ref([]); // выбраные id начислений, у которых есть переплата
     const selectedCounterData = ref(); // данные по выбранному счетчику
     const isCheckedForPayment = ref(false); // блокирует кнопку массовой оплаты квитанций
     const selectedCalcsForPayment = ref([]); // для выбраных квитанций для оплаты
@@ -303,10 +305,15 @@ export default {
       // };
     };
 
-    const selectPayForm = (calcId, amount, counterId) => {
+    const selectPayForm = (calcId, amount, counterId, overpayment) => {
       selectedCalc.value = calcId;
       selectedAmount.value = amount;
       selectedCounter.value = counterId;
+      selectedOverpayment.value = overpayment;
+      console.log("calcRecords: ", calcRecords.value);
+      selectedCalcOverpayment.value = calcRecords.value.filter(
+        (record) => record.payment < 0
+      );
       showPayForm.value = true;
       show.value = true;
     };
@@ -473,6 +480,7 @@ export default {
         showUpdateCalc.value = false;
         showUpdateCounter.value = false;
         showArendForm.value = false;
+        selectedCalcsForPayment.value = [];
       }
     });
 
@@ -576,6 +584,8 @@ export default {
       selectedArendatorForUpdate,
       selectUpdateArendator,
       clearSearch,
+      selectedOverpayment,
+      selectedCalcOverpayment,
     };
   },
 };
@@ -616,6 +626,8 @@ export default {
         :counterId="selectedCounter"
         :calcId="selectedCalc"
         :amount="selectedAmount"
+        :overpayment="selectedOverpayment"
+        :calcsOverpayment="selectedCalcOverpayment"
         :selectedCalcsForPayment="selectedCalcsForPayment"
         @cancel="show = false"
         @submitForm="reloadCalculation"

@@ -429,7 +429,14 @@ export default {
     function selectPay(calcId, amount) {
       console.log("Выбрали оплатить квитанцию: ", calcId);
       console.log("сумма оплати: ", amount);
-      emit("select-pay", calcId, amount, props.counterId);
+
+      // cчитаем переплату, чтобы была возможность учесть ее при оплате
+      const overpayment = props.calcRecords.reduce((total, record) => {
+        total += record.payment < 0 ? Math.abs(record.payment) : 0;
+        return total;
+      }, 0);
+      console.log("overpayment: ", overpayment);
+      emit("select-pay", calcId, amount, props.counterId, overpayment);
     }
 
     function updateCalc(calcId) {

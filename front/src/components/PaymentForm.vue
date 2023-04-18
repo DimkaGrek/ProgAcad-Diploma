@@ -1,16 +1,27 @@
 <script>
 import { useForm } from "../hooks/form";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 const required = (val) => !!val;
 const number = (val) => !isNaN(val);
 
 export default {
-  props: ["calcId", "amount", "counterId", "selectedCalcsForPayment"],
+  props: [
+    "calcId",
+    "amount",
+    "counterId",
+    "selectedCalcsForPayment",
+    "overpayment",
+    "calcsOverpayment",
+  ],
   setup(props, { emit }) {
     console.log("props.calcId: ", props.calcId);
     console.log("props.amount: ", props.amount);
     console.log("props.counterId: ", props.counterId);
+    console.log("props.overpayment: ", props.overpayment);
+    console.log("calcsOverpayment: ", props.calcsOverpayment);
+
+    const isCheckOverpayment = ref(false); // выбрана переплата или нет
 
     // const calcForPayment = ref(props.selectedCalcsForPayment);
 
@@ -107,9 +118,9 @@ export default {
 
     function addPayment() {
       if (isMassivePayment.value) {
-        console.log("ДОБАВЛЕНИЕ МАССОВОГО НАЧИСЛЕНИЯ!");
+        console.log("ДОБАВЛЕНИЕ МАССОВОЙ ОПЛАТЫ!");
       } else {
-        console.log("ДОБАВЛЕНИЕ НАЧИСЛЕНИЯ!");
+        console.log("ДОБАВЛЕНИЕ ОПЛАТЫ!");
       }
 
       console.log(Object.keys(form));
@@ -127,15 +138,34 @@ export default {
         formSend.amountsPay = amountsPay.value; // добавляем список сумм каждой квитанции
         sendFetch("api/payments/" + idsPay.value, formSend);
       } else {
+        if (isCheckOverpayment.value) {
+          // если выбрана переплата, то отправляем на backend еще переплату и начисления, которые имеют переплату
+
+          formSend.overpayment =
+            props.overpayment > props.amount ? props.amount : props.overpayment;
+          formSend.idsOverpayment = props.calcsOverpayment.map(
+            (record) => record.id
+          );
+        }
         formSend.amountsPay = props.amount;
         sendFetch("api/payments/" + props.calcId, formSend);
       }
       console.log(JSON.stringify(formSend));
     }
 
-    // if (calcForPayment.value.length === 0)
-    //   console.log("calcForPayment пусто!!!");
-    // else console.log("calcForPayment: ", calcForPayment);
+    function selectOverpayment(event) {
+      if (event.target.checked) {
+        form.amount.value < props.overpayment
+          ? ((form.amount.value = "0"), (form.receiptId.value = "0"))
+          : (form.amount.value = form.amount.value - props.overpayment);
+
+        isCheckOverpayment.value = true;
+      } else {
+        form.amount.value = props.amount;
+        form.receiptId.value = "";
+        isCheckOverpayment.value = false;
+      }
+    }
 
     return {
       form,
@@ -144,6 +174,7 @@ export default {
       monthesPay,
       idsPay,
       amountsPay,
+      selectOverpayment,
     };
   },
 };
@@ -157,6 +188,7 @@ export default {
       </h1>
       <h1 v-else class="ff-500-18">{{ $translate.t("makePayment") }}</h1>
       <small>( * - {{ $translate.t("requiredFields") }})</small>
+      isMassivePayment: {{ isMassivePayment }}
     </div>
     <div class="add-main ff-500-14">
       <form @submit.prevent="">
@@ -212,6 +244,20 @@ export default {
           <small v-else-if="form.amount.touched && form.amount.errors.number"
             >{{ $translate.t("formErrorPayAmountNum") }}.</small
           >
+          <div v-if="overpayment > 0 && !isMassivePayment">
+            <label for="checkbox" class="checkbox-label">
+              <input
+                @change="selectOverpayment"
+                id="checkbox"
+                type="checkbox"
+                class="checkbox-input"
+              />
+              <span class="checkbox-custom"></span>
+            </label>
+            <span style="padding-left: 5px">
+              учесть переплату {{ overpayment }}</span
+            >
+          </div>
         </div>
 
         <div class="label">
