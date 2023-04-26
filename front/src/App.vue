@@ -10,6 +10,7 @@ import CalcForm from "./components/CalcForm.vue";
 import PaymentForm from "./components/PaymentForm.vue";
 import ArendatorsTable from "./components/ArendatorsTable.vue";
 import ArendatorForm from "./components/ArendatorForm.vue";
+import InactiveCounters from "./components/InactiveCounters.vue";
 
 export default {
   components: {
@@ -23,6 +24,7 @@ export default {
     PaymentForm,
     ArendatorsTable,
     ArendatorForm,
+    InactiveCounters,
   },
   setup() {
     const username = ref(null);
@@ -42,6 +44,7 @@ export default {
     const showArendators = ref(false);
     const showArendForm = ref(false);
     const showUpdateArendator = ref(false);
+    const showInactiveCounters = ref(false); // показывать таблицу неактивных счетчиков
 
     const messageTop = ref(0);
     const messageLeft = ref(0);
@@ -52,6 +55,8 @@ export default {
     const deleteCounters = ref(null);
     const deletedCounters = ref([]);
     const numberOfDeletedCounters = ref(0);
+
+    const inactiveCounters = ref([]); // массив с неактивными счетчиками
 
     const arendators = ref([]);
     const totalArendators = ref();
@@ -189,6 +194,7 @@ export default {
       showCounters.value = true;
       showCalc.value = false;
       showArendators.value = false;
+      showInactiveCounters.value = false;
     }
 
     function clickHome() {
@@ -197,6 +203,7 @@ export default {
       showCounters.value = false;
       showCalc.value = false;
       showArendators.value = false;
+      showInactiveCounters.value = false;
     }
 
     function clickArendators() {
@@ -209,6 +216,7 @@ export default {
       showHome.value = false;
       showCounters.value = false;
       showCalc.value = false;
+      showInactiveCounters.value = false;
     }
 
     // функция для перезагрузки счетчиков, когда был добавлен новый счетчик
@@ -305,6 +313,13 @@ export default {
       // };
     };
 
+    function undeleteCounters() {
+      showInactiveCounters.value = false;
+      fetchNumberOfDeletedCounters();
+      fetchCounters();
+      showCounters.value = true;
+    }
+
     const selectPayForm = (calcId, amount, counterId, overpayment) => {
       selectedCalc.value = calcId;
       selectedAmount.value = amount;
@@ -366,6 +381,19 @@ export default {
         console.error("Ошибка загрузки данных:", error);
       }
     };
+
+    async function selectInactive() {
+      try {
+        const response = await fetch("/api/counters/delete");
+        const data = await response.json();
+        inactiveCounters.value = data;
+        console.log("inactiveCounters: ", inactiveCounters.value);
+        showInactiveCounters.value = true;
+        showCounters.value = false;
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+      }
+    }
 
     async function fetchPay(calcId) {
       try {
@@ -586,6 +614,10 @@ export default {
       clearSearch,
       selectedOverpayment,
       selectedCalcOverpayment,
+      showInactiveCounters,
+      inactiveCounters,
+      selectInactive,
+      undeleteCounters,
     };
   },
 };
@@ -754,6 +786,7 @@ export default {
           v-if="!loading"
           :totalCounters="totalCounters"
           :showCounters="showCounters"
+          :showInactiveCounters="showInactiveCounters"
           :showArendators="showArendators"
           :totalArendators="totalArendators"
           :showCalc="showCalc"
@@ -766,6 +799,7 @@ export default {
           @showModal="show = true"
           @show-calc-form="selectCalcForm"
           @showArendForm="selectArendForm"
+          @selectInactive="selectInactive"
         ></TopNav>
         <CountersTable
           v-if="showCounters && !loading"
@@ -776,6 +810,12 @@ export default {
           @selectDeleteCounter="selectDeleteCounter"
           @registerDeleteCounters="onRegisterDeleteCounters"
         ></CountersTable>
+
+        <InactiveCounters
+          v-if="showInactiveCounters"
+          :inactiveCounters="inactiveCounters"
+          @undeleteCounters="undeleteCounters"
+        />
 
         <CalculationTable
           v-if="showCalc && !loading"

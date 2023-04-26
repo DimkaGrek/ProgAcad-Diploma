@@ -99,7 +99,7 @@ public class CounterController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @PostMapping("/api/counters/undelete/{counterIds}")
+    @PostMapping("/api/counters/undelete/{counterIds}") // восстоновить счетчики из удаленных
     public ResponseEntity<Void> unDeleteCounters(@PathVariable List<Long> counterIds) {
         if ( ! counterService.unDeleteCounters(counterIds)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);

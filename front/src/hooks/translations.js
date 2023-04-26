@@ -66,6 +66,7 @@ const translations = {
     formErrorParentCounterDigit:
       "The number of the parent counter must be a number",
     titleCounters: "Counters",
+    titleInactiveCounters: "Inactive Counters",
     titleTenants: "Tenants",
     counter: "Counter",
     all: "All",
@@ -131,6 +132,7 @@ const translations = {
     formErrorPayAmountNum: "Payment amount must be a number",
     userProfile: "Profile",
     exit: "Exit",
+    restore: "Restore",
   },
   ua: {
     welcome: "Ласкаво просимо",
@@ -199,6 +201,7 @@ const translations = {
     formErrorParentCounterDigit:
       "№ батьківського лічильника повинен бути числом",
     titleCounters: "Лічильники",
+    titleInactiveCounters: "Неактивні лічильники",
     titleTenants: "Орендарі",
     counter: "Лічильник",
     all: "Усі",
@@ -264,6 +267,7 @@ const translations = {
     formErrorPayAmountNum: "Сума оплати повинна бути числом",
     userProfile: "Профіль",
     exit: "Вихід",
+    restore: "Відновити",
   },
   ru: {
     welcome: "Добро пожаловать",
@@ -331,6 +335,7 @@ const translations = {
     formErrorParentCounterReq: "Пожалуйста введите № родительского счетчика",
     formErrorParentCounterDigit: "№ родительского счетчика должен быть числом",
     titleCounters: "Счетчики",
+    titleInactiveCounters: "Неактивные счетчики",
     titleTenants: "Арендаторы",
     counter: "Счетчик",
     all: "Все",
@@ -396,6 +401,7 @@ const translations = {
     formErrorPayAmountNum: "Сумма оплаты должна быть числом",
     userProfile: "Профиль",
     exit: "Вихід",
+    restore: "Восстановить",
   },
 };
 

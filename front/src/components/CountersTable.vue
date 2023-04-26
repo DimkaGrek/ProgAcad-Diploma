@@ -80,6 +80,7 @@ export default defineComponent({
       selectedCounterId.value = counterId;
       const element = event.target;
       const rect = element.getBoundingClientRect();
+      console.log("rect.top: ", rect.top);
       menuTop.value = rect.top + window.pageYOffset;
       menuLeft.value = rect.left + window.pageXOffset + rect.width * 0.75;
     };

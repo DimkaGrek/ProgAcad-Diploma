@@ -18,8 +18,9 @@ export default {
     "numberOfDeletedCounters",
     "showArendators",
     "totalArendators",
+    "showInactiveCounters",
   ],
-  emits: ["showModal", "show-calc-form", "showArendForm"],
+  emits: ["showModal", "show-calc-form", "showArendForm", "selectInactive"],
   setup(props) {
     console.log("props totalCounters: ", props.totalCounters);
     console.log("props showCounters: ", props.showCounters);
@@ -68,6 +69,12 @@ export default {
         <h2>{{ $translate.t("titleCounters") }}</h2>
         <div class="count indi">
           {{ totalCounters }}
+        </div>
+      </template>
+      <template v-if="showInactiveCounters">
+        <h2>{{ $translate.t("titleInactiveCounters") }}</h2>
+        <div class="count indi">
+          {{ numberOfDeletedCounters }}
         </div>
       </template>
       <template v-if="showArendators">
@@ -213,7 +220,9 @@ export default {
       <div class="info-item-top">
         <template v-if="showCounters">
           <div class="info-text">
-            <a href="">{{ $translate.t("inactive") }}</a>
+            <span @click="$emit('selectInactive')" class="link-text">{{
+              $translate.t("inactive")
+            }}</span>
           </div>
           <div class="count indi">{{ numberOfDeletedCounters }}</div>
         </template>
