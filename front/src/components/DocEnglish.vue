@@ -1,5 +1,5 @@
 <template>
-  <div class="ff-500-18">
+  <div class="ff-500-18 text">
     <p>
       This is a web application that allows you to keep track of electricity
       meters in company.
@@ -228,6 +228,9 @@
 <style scoped>
 ul li {
   margin-bottom: 10px;
+}
+.text {
+  line-height: 1.5;
 }
 .label {
   border: 1px solid black;

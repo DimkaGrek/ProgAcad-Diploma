@@ -4,6 +4,7 @@
     box-sizing: border-box;
 }
 body {
+    height: 100%;
     background: linear-gradient(#4E4AE2, #4B88E3) no-repeat; 
 }
 
@@ -75,6 +76,8 @@ a.white{
     height: 57px;
     width: 57px;
     margin: 200px auto;
+    position: absolute;
+    left: 50%;
     
     border: 0px solid #5E5ADB;
     border-radius: 83%;
@@ -214,6 +217,7 @@ a.white{
     /* border: 1px solid #fff; */
     margin: auto;
     max-width: 1440px;
+    height: 100%;
 }
 .sidebar{
     display: flex;
@@ -221,7 +225,7 @@ a.white{
     justify-content: flex-start;
     align-items: center;
     width: 72px;
-    height: 800px;
+    height: 90vh;
     background-color: #151357;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -250,7 +254,7 @@ a.white{
 .right{
     width: 100%;
     background-color: #fff;
-    height: 800px;
+    height: 90vh;
     overflow: hidden;
 }
 .topnav{
@@ -410,7 +414,7 @@ a.white{
 }
 .table-scroll{
     overflow-y: auto;
-    height: 550px;
+    height: 75%;
     scrollbar-color: rgba(247, 249, 252, 0.8);
     scrollbar-width: thin;
 }

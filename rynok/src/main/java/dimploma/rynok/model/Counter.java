@@ -60,6 +60,9 @@ public class Counter {
     @OneToMany(mappedBy = "counter", cascade = CascadeType.PERSIST)
     private List<Calculation> calculations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "counter", cascade = CascadeType.PERSIST)
+    private List<Payment> payments = new ArrayList<>();
+
     public Counter(String pavilion, String place, String type, Long number, Long atomicity, LocalDate dateManufac, LocalDate dateInstall, String notes, Long parent) {
         this.pavilion = pavilion;
         this.place = place;

@@ -6,15 +6,22 @@ import {
   onMounted,
   onUnmounted,
   inject,
+  watch,
 } from "vue";
+import CreatePDF from "./UI/CreatePDF.vue";
 
 export default defineComponent({
+  components: {
+    CreatePDF,
+  },
   props: ["counters", "show"],
   emits: [
     "select-counter",
     "selectUpdateCounter",
     "selectDeleteCounter",
     "registerDeleteCounters",
+    "isSelectedIds",
+    "noSelectedIds",
   ],
   setup(props, { emit }) {
     const selectedIds = ref([]);
@@ -27,6 +34,10 @@ export default defineComponent({
 
     const menuTop = ref(0);
     const menuLeft = ref(0);
+
+    const showPDF = ref(null);
+    const calculationsForPrint = ref(null);
+    const loading = ref(false);
 
     const selectCounter = (counterId, number, pavilion, place) => {
       const counterData = {
@@ -80,7 +91,6 @@ export default defineComponent({
       selectedCounterId.value = counterId;
       const element = event.target;
       const rect = element.getBoundingClientRect();
-      console.log("rect.top: ", rect.top);
       menuTop.value = rect.top + window.pageYOffset;
       menuLeft.value = rect.left + window.pageXOffset + rect.width * 0.75;
     };
@@ -120,6 +130,96 @@ export default defineComponent({
       emit("selectDeleteCounter", selectedIds.value);
     }
 
+    async function fetchAddCountersToGroup(uri) {
+      // отправляем данные на сервер
+      await fetch(uri, {
+        method: "POST",
+      })
+        .then((response) => {
+          if (response.ok) {
+            //response.json()
+            console.log("Счетчики добавлены в группу!");
+            alert("Данні збережені успішно!");
+            selectedIds.value = [];
+            emit("submitForm");
+          } else {
+            // Обработка ошибки
+            response.text().then((text) => {
+              console.error("Ошибка " + response.status + " - " + text);
+            });
+            if (response.status == 409) {
+              // state.existCounter = true;
+              // form.number.valid = false;
+            }
+          }
+        })
+        .catch((error) => console.error("Ошибка сети: " + error));
+    }
+    const addCountersToGroup = (groupId) => {
+      console.log("Метод addCountersToGroup in CountersTable вызван...");
+      console.log("groupId: ", groupId);
+      if (selectedIds.value.length > 0) {
+        const uri =
+          "api/groups/counters/" +
+          groupId +
+          "?counterIds=" +
+          selectedIds.value.join(",");
+        console.log("uri: ", uri);
+        fetchAddCountersToGroup(uri);
+      }
+    };
+
+    const monthList = [
+      "Январь",
+      "Февраль",
+      "Март",
+      "Апрель",
+      "Май",
+      "Июнь",
+      "Июль",
+      "Август",
+      "Сентябрь",
+      "Октябрь",
+      "Ноябрь",
+      "Декабрь",
+    ];
+
+    const now = new Date();
+    const yearNow = now.getFullYear();
+    const lastMonth = now.getMonth() - 1;
+
+    const printMonthCalc = async () => {
+      console.log("Метод printMonthCalc in CountersTable вызван...");
+      const month = monthList[lastMonth] + " " + yearNow;
+      console.log("month: ", month);
+      console.log("selectedIds: ", selectedIds.value);
+      console.log(
+        "uri: ",
+        "api/calculations/" + selectedIds.value + "?month=" + month
+      );
+      loading.value = true;
+      try {
+        const response = await fetch(
+          "api/calculations/" + selectedIds.value + "?month=" + month
+        );
+        const data = await response.json();
+        console.log("calculations: ", data);
+        calculationsForPrint.value = data;
+        loading.value = false;
+        showPDF.value = true;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    watch(selectedIds, () => {
+      if (selectedIds.value.length > 0) {
+        emit("isSelectedIds");
+      } else {
+        emit("noSelectedIds");
+      }
+    });
+
     return {
       selectCounter,
       toggleSelectionAll,
@@ -137,6 +237,11 @@ export default defineComponent({
       searchQuery,
       clearSearch,
       props,
+      addCountersToGroup,
+      printMonthCalc,
+      showPDF,
+      calculationsForPrint,
+      loading,
     };
   },
 });
@@ -145,6 +250,13 @@ export default defineComponent({
 <template>
   <!-- <div>{{ selectedIds }}</div>
   selectedCounterId: {{ selectedCounterId }} -->
+  <div v-if="loading" class="loading"></div>
+  <CreatePDF
+    v-if="showPDF"
+    :calculationsForPrint="calculationsForPrint"
+    @closeFrame="showPDF = false"
+  />
+
   <div class="table-scroll">
     <div v-if="showAttentionMessage" class="attention">
       <h1 class="ff-500-18">{{ $translate.t("areYouSure") }}</h1>

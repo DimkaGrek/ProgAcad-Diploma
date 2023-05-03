@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -17,7 +18,10 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/api/groups")
-    public ResponseEntity<Void> createGroup(@RequestParam String name, @RequestParam String description) {
+    public ResponseEntity<Void> createGroup(@RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String description = request.get("description");
+
         if ( ! groupService.createGroup(name, description)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }

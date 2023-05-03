@@ -1,6 +1,7 @@
 package dimploma.rynok.controllers;
 
 import dimploma.rynok.dto.CalculationDTO;
+import dimploma.rynok.dto.CalculationPrintDTO;
 import dimploma.rynok.repo.CalculationRepository;
 import dimploma.rynok.services.CalculationService;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,17 @@ public class CalculationController {
     @GetMapping("/api/calculation/{counterId}")
     public List<CalculationDTO> getCalculationByCounter(@PathVariable Long counterId) {
         return calculationService.getCalculationByCounter(counterId);
+    }
+
+    @GetMapping("/api/calculations/{counterIds}")
+    public List<CalculationPrintDTO> getCalculationsForMonthByCounters(@PathVariable List<Long> counterIds, @RequestParam String month) {
+        System.out.println("month: " + month);
+//        LocalDate currentDate = LocalDate.now();
+//        LocalDate previousMonthDate = currentDate.minusMonths(1);
+//        Month previousMonth = previousMonthDate.getMonth();
+//        System.out.println("previousMonth: " + previousMonth);
+//        System.out.println("previousMonth number" + previousMonth.getValue());
+        return calculationService.getCalculationsForMonthByCounters(counterIds, month);
     }
 
     @PostMapping("/api/calculations/{counterId}")
@@ -70,4 +82,6 @@ public class CalculationController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
+
 }

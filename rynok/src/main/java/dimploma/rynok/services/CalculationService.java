@@ -1,11 +1,9 @@
 package dimploma.rynok.services;
 
 import dimploma.rynok.dto.CalculationDTO;
+import dimploma.rynok.dto.CalculationPrintDTO;
 import dimploma.rynok.dto.PaymentDTO;
-import dimploma.rynok.model.Arendator;
-import dimploma.rynok.model.Calculation;
-import dimploma.rynok.model.Counter;
-import dimploma.rynok.model.CustomUser;
+import dimploma.rynok.model.*;
 import dimploma.rynok.repo.CalculationRepository;
 import dimploma.rynok.repo.CounterRepository;
 import dimploma.rynok.repo.UserRepository;
@@ -92,5 +90,36 @@ public class CalculationService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public List<CalculationPrintDTO> getCalculationsForMonthByCounters(List<Long> counterIds, String month) {
+        List<Calculation> calculations = calculationRepository.getCalculationsForMonthByCounters(counterIds, month);
+        return calculations.stream().map(calc -> new CalculationPrintDTO(calc.getId(), calc.getMonth(), calc.getDate(),
+                (calc.getArendator() == null) ? calc.getCounter().getArendator().getName() : calc.getArendator().getName(),
+                (calc.getArendator() == null) ? calc.getCounter().getArendator().getSurname() : calc.getArendator().getSurname(),
+                calc.getCountNow(), calc.getCountBefore(), calc.getDifference(), calc.getRate(), calc.getAmount(), calc.getNotes(),
+                getPayments(calc.getId(), calc.getAmount()), calc.getCounter().getPavilion(), calc.getCounter().getPlace(), calc.getCounter().getId(),
+                        getTotalCalcAmount(calc.getCounter()), getTotalPayAmount(calc.getCounter())))
+                .collect(Collectors.toList());
+
+    }
+
+    private Double getTotalCalcAmount(Counter counter) {
+        List<Calculation> calculations = counter.getCalculations();
+        Double totalAmount = 0.0;
+        for (Calculation calculation : calculations) {
+            totalAmount += calculation.getAmount();
+        }
+        return totalAmount;
+    }
+
+    private Double getTotalPayAmount(Counter counter) {
+        List<Payment> payments = counter.getPayments();
+        Double totalAmount = 0.0;
+        for (Payment payment : payments) {
+            totalAmount += payment.getAmount();
+        }
+        return totalAmount;
     }
 }

@@ -11,6 +11,7 @@ import PaymentForm from "./components/PaymentForm.vue";
 import ArendatorsTable from "./components/ArendatorsTable.vue";
 import ArendatorForm from "./components/ArendatorForm.vue";
 import InactiveCounters from "./components/InactiveCounters.vue";
+import CreateGroup from "./components/CreateGroup.vue";
 
 export default {
   components: {
@@ -25,6 +26,7 @@ export default {
     ArendatorsTable,
     ArendatorForm,
     InactiveCounters,
+    CreateGroup,
   },
   setup() {
     const username = ref(null);
@@ -45,10 +47,20 @@ export default {
     const showArendForm = ref(false);
     const showUpdateArendator = ref(false);
     const showInactiveCounters = ref(false); // показывать таблицу неактивных счетчиков
+    const showCreateGroup = ref(false);
 
     const messageTop = ref(0);
     const messageLeft = ref(0);
     const messageText = ref("");
+
+    const menuTop = ref(0);
+    const menuLeft = ref(0);
+    const isShowDropMenu = ref(false);
+
+    const menuGroupTop = ref(0);
+    const menuGroupLeft = ref(0);
+    const isShowGroupMenu = ref(false);
+    const isSelectedIds = ref(false); // если выбраны ids в таблице счетчиков
 
     const counters = ref([]);
     const totalCounters = ref();
@@ -57,6 +69,9 @@ export default {
     const numberOfDeletedCounters = ref(0);
 
     const inactiveCounters = ref([]); // массив с неактивными счетчиками
+
+    const groups = ref([]); // массив со списком групп
+    const countersTableRef = ref(null);
 
     const arendators = ref([]);
     const totalArendators = ref();
@@ -77,6 +92,7 @@ export default {
     const selectedCounterData = ref(); // данные по выбранному счетчику
     const isCheckedForPayment = ref(false); // блокирует кнопку массовой оплаты квитанций
     const selectedCalcsForPayment = ref([]); // для выбраных квитанций для оплаты
+    const calculationTableRef = ref(null);
 
     const searchQuery = ref("");
     const clearSearch = () => {
@@ -89,7 +105,6 @@ export default {
     const selectedCounterForUpdate = ref();
 
     const MassivePayment = ref(null);
-    const PrintCalculations = ref(null);
     const deleteCalculations = ref(null);
 
     function callDelete() {
@@ -115,20 +130,6 @@ export default {
         MassivePayment.value();
       } else {
         console.log("Функция дочернего компонента не доступна");
-      }
-    };
-
-    const onRegisterPrintCalculations = (fn) => {
-      console.log("вызов onRegisterPrintCalculations");
-      PrintCalculations.value = fn;
-    };
-
-    const callPrintCalculationsFromParent = () => {
-      console.log("callPrintCalculationsFromParent вызвана");
-      if (PrintCalculations.value) {
-        PrintCalculations.value();
-      } else {
-        console.log("Функция печати дочернего компонента не доступна");
       }
     };
 
@@ -466,6 +467,16 @@ export default {
       }
     }
 
+    async function fetchGroups() {
+      try {
+        const response = await fetch("api/groups");
+        const data = await response.json();
+        groups.value = data;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     async function fetchCurrentUser() {
       try {
         const response = await fetch("api/current", {
@@ -475,6 +486,7 @@ export default {
         username.value = userData.username;
         globalState.setUsername(username.value);
         fetchCounters();
+        fetchGroups();
         showCounters.value = true;
       } catch (error) {
         console.error(error);
@@ -537,6 +549,68 @@ export default {
       showMessage.value = true;
     };
 
+    const showDropMenu = (event) => {
+      const button = event.target;
+      const rect = button.getBoundingClientRect();
+      menuTop.value = rect.top + rect.height / 2;
+      menuLeft.value = rect.left + rect.width / 2;
+      isShowDropMenu.value = true;
+    };
+
+    const showCountersToGroup = (event) => {
+      const rect = event.target.getBoundingClientRect();
+      menuGroupTop.value = rect.top - 22;
+      menuGroupLeft.value = rect.left + rect.width;
+      isShowGroupMenu.value = true;
+    };
+
+    function addNewGroup() {
+      showCreateGroup.value = true;
+      show.value = true;
+      showCounters.value = false;
+    }
+
+    function reloadGroups() {
+      fetchGroups();
+      showCreateGroup.value = false;
+      show.value = false;
+      showCounters.value = true;
+    }
+
+    const selectAddCountersToGroup = (idGroup) => {
+      console.log("idGroup: ", idGroup);
+      countersTableRef.value.addCountersToGroup(idGroup);
+    };
+
+    async function fetchGroupCounters(groupId) {
+      try {
+        const response = await fetch("api/groups/counters/" + groupId);
+        const data = await response.json();
+        counters.value = data;
+        totalCounters.value = counters.value.length;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const selectGroup = (groupId) => {
+      if (groupId == "all") {
+        fetchCounters();
+      } else {
+        fetchGroupCounters(groupId);
+      }
+    };
+
+    const printMonthCalc = () => {
+      console.log("select printMonthCalc...");
+      countersTableRef.value.printMonthCalc();
+    };
+
+    const callPrintCalculations = () => {
+      console.log("select callPrintCalculations...");
+      calculationTableRef.value.callPrintCalculations();
+    };
+
     return {
       show,
       clickCounters,
@@ -576,9 +650,6 @@ export default {
       isCheckedForPayment,
       selectMassiveForPayment,
       selectedCalcsForPayment,
-      onRegisterPrintCalculations,
-      callPrintCalculationsFromParent,
-      PrintCalculations,
       showUpdateCalc,
       selectUpdateCalc,
       calcForUpdate,
@@ -618,6 +689,26 @@ export default {
       inactiveCounters,
       selectInactive,
       undeleteCounters,
+      showDropMenu,
+      menuTop,
+      menuLeft,
+      isShowDropMenu,
+      showCreateGroup,
+      addNewGroup,
+      reloadGroups,
+      groups,
+      fetchGroups,
+      showCountersToGroup,
+      menuGroupTop,
+      menuGroupLeft,
+      isShowGroupMenu,
+      countersTableRef,
+      selectAddCountersToGroup,
+      selectGroup,
+      isSelectedIds,
+      printMonthCalc,
+      calculationTableRef,
+      callPrintCalculations,
     };
   },
 };
@@ -670,6 +761,11 @@ export default {
         :showUpdateArendator="showUpdateArendator"
         @cancel="show = false"
         @submitForm="reloadArendators"
+      />
+      <create-group
+        v-if="showCreateGroup"
+        @cancel="(show = false), (showCounters = true)"
+        @submitForm="reloadGroups"
       />
     </my-dialog>
     <header>
@@ -738,9 +834,53 @@ export default {
     <div v-else class="container">
       <div class="sidebar">
         <div><img src="./components/icons/logo.svg" alt="logo" /></div>
-        <button>
-          <img src="./components/icons/folder.svg" alt="folder" />
-        </button>
+        <div @mouseleave="(isShowDropMenu = false), (isShowGroupMenu = false)">
+          <button @mouseenter="showDropMenu">
+            <img src="./components/icons/folder.svg" alt="folder" />
+          </button>
+
+          <div
+            v-if="isShowDropMenu"
+            class="dropdown-menu"
+            :style="{
+              position: 'absolute',
+              top: `${menuTop}px`,
+              left: `${menuLeft}px`,
+            }"
+          >
+            <div class="menu-text indi ff-500-14" @click="addNewGroup">
+              {{ $translate.t("addNewGroup") }}
+            </div>
+            <div
+              v-if="isSelectedIds"
+              class="menu-text indi ff-500-14"
+              @click="showCountersToGroup"
+            >
+              {{ $translate.t("addCountersToGroup") }}
+              <span style="padding-left: 20px"> > </span>
+            </div>
+          </div>
+
+          <div
+            v-if="isShowGroupMenu"
+            class="dropdown-menu"
+            :style="{
+              position: 'absolute',
+              top: `${menuGroupTop}px`,
+              left: `${menuGroupLeft}px`,
+            }"
+          >
+            <div
+              v-for="g in groups"
+              :key="g.id"
+              class="menu-text indi ff-500-14"
+              @click="selectAddCountersToGroup(g.id)"
+            >
+              {{ g.name }}
+            </div>
+          </div>
+        </div>
+
         <button
           @click="
             () => {
@@ -755,7 +895,13 @@ export default {
           <img src="./components/icons/money.svg" alt="payment" />
         </button>
         <button
-          @click="callPrintCalculationsFromParent"
+          @click="
+            showCalc && isCheckedForPayment
+              ? callPrintCalculations()
+              : isSelectedIds
+              ? printMonthCalc()
+              : ''
+          "
           @mouseenter="showMessageFunction($event, $translate.t('btnPrint'))"
           @mouseleave="showMessage = false"
         >
@@ -796,19 +942,24 @@ export default {
           :totalCalcAmount="totalCalcAmount"
           :totalPayAmount="totalPayAmount"
           :numberOfDeletedCounters="numberOfDeletedCounters"
+          :groups="groups"
           @showModal="show = true"
           @show-calc-form="selectCalcForm"
           @showArendForm="selectArendForm"
           @selectInactive="selectInactive"
+          @selectGroup="selectGroup"
         ></TopNav>
         <CountersTable
           v-if="showCounters && !loading"
           :counters="counters"
           :show="show"
+          ref="countersTableRef"
           @select-counter="selectCounter"
           @selectUpdateCounter="selectUpdateCounter"
           @selectDeleteCounter="selectDeleteCounter"
           @registerDeleteCounters="onRegisterDeleteCounters"
+          @isSelectedIds="isSelectedIds = true"
+          @noSelectedIds="isSelectedIds = false"
         ></CountersTable>
 
         <InactiveCounters
@@ -822,8 +973,8 @@ export default {
           @update:is-checked-for-payment="
             (newValue) => (isCheckedForPayment = newValue)
           "
+          ref="calculationTableRef"
           @registerMassivePayment="onRegisterMassivePayment"
-          @registerPrintCalculations="onRegisterPrintCalculations"
           @registerDeleteCalculations="onRegisterDeleteCalculations"
           :show="show"
           :calcRecords="calcRecords"
@@ -908,5 +1059,25 @@ export default {
   font-style: normal;
   font-weight: 700;
   font-size: 30px;
+}
+
+.dropdown-menu {
+  /* top: 0;
+  right: 40; */
+  background: #ffffff;
+  /* shadow-m */
+  box-shadow: 0px 0px 0px 1px rgba(152, 161, 179, 0.1),
+    0px 15px 35px -5px rgba(17, 24, 38, 0.15), 0px 5px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+
+  /* padding: 8px 6px; */
+  z-index: 2;
+}
+.menu-text {
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.menu-text:hover {
+  text-decoration-line: underline;
 }
 </style>

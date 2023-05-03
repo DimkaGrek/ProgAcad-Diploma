@@ -1,8 +1,9 @@
 <script>
 import moment from "moment";
 import { ref, computed, watch, onMounted, inject } from "vue";
+import CreatePDF from "./UI/CreatePDF.vue";
 
-import pdfMake, { initPdfMake } from "@/pdfmake.client";
+// import pdfMake, { initPdfMake } from "@/pdfmake.client";
 // import pdfMake from "pdfmake/build/pdfmake";
 // import * as pdfFonts from "pdfmake/build/vfs_fonts";
 // pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -12,6 +13,9 @@ import pdfMake, { initPdfMake } from "@/pdfmake.client";
 // pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
+  components: {
+    CreatePDF,
+  },
   props: [
     "calcRecords",
     "counterId",
@@ -40,6 +44,8 @@ export default {
     console.log("props counterData: ", props.counterData);
     const selectedIds = ref([]);
     const selectedColumn = ref("");
+    const calculationsForPrint = ref(null);
+    const isFromCalcTable = ref(false);
     const showAttentionMessage = ref(false); // показать окно предупреждения
     const formatDate = (date) => {
       return moment(date).format("DD.MM.YYYY");
@@ -128,261 +134,267 @@ export default {
 
     const callPrintCalculations = async () => {
       console.log("Функция печати квитанций вызвана");
-      if (selectedIdForPayment.value[0] !== undefined) {
-        await initPdfMake();
-        const selectedCalcs = props.calcRecords.filter((record) =>
-          selectedIdForPayment.value.includes(record.id)
-        );
-        const pages = [];
-        const itemsPerPage = 3;
-        for (let i = 0; i < selectedCalcs.length; i += itemsPerPage) {
-          const page = selectedCalcs.slice(i, i + itemsPerPage);
-          pages.push(page);
-        }
-        console.log("selectedCalcs: ", selectedCalcs[0].id);
-        console.log("props.counterData", props.counterData);
-        console.log("props.counterId", props.counterId);
-        console.log("pages[]: ", pages);
-        const content = [];
-        for (let i = 0; i < pages.length; i++) {
-          for (const calc of pages[i]) {
-            content.push(
-              {
-                text: [
-                  { text: "ПОВІДОМЛЕННЯ № ", style: "header" },
-                  {
-                    text: calc.id,
-                    style: "header",
-                    lineHeight: 2,
-                  },
-                ],
-                margin: [0, 10, 0, 0],
-              },
-              {
-                text: [
-                  { text: "ПІБ: ", bold: true },
-                  {
-                    text: calc.name + " " + calc.surname,
-                    style: "textItalic",
-                    lineHeight: 1.5,
-                  },
-                ],
-              },
-              {
-                text: [
-                  { text: "№ Павільону:    ", bold: true },
-                  {
-                    text: props.counterData.pavilion + "        ",
-                    style: "textItalic",
-                  },
-                  { text: "№ Місця:    ", bold: true },
-                  {
-                    text: props.counterData.place + "\u00A0".repeat(35),
-                    style: "textItalic",
-                  },
-                  {
-                    text: "Період споживання:    ",
-                    bold: true,
-                    alignment: "right",
-                  },
-                  {
-                    text: calc.month,
-                    style: "textItalic",
-                    lineHeight: 1.5,
-                  },
-                ],
-              },
-              {
-                // layout: "lightHorizontalLines", // optional
-                table: {
-                  // headers are automatically repeated if the table spans over multiple pages
-                  // you can declare how many rows should be treated as headers
-                  // headerRows: 1,
-                  widths: ["*", "auto"],
+      calculationsForPrint.value = props.calcRecords.filter((record) =>
+        selectedIdForPayment.value.includes(record.id)
+      );
+      isFromCalcTable.value = true;
+      showPDF.value = true;
 
-                  body: [
-                    [
-                      {
-                        text: "Найменування послуг",
-                        style: "tableTextBold",
-                      },
-                      {
-                        text: "Сумма до оплати, грн.",
-                        style: "tableTextBold",
-                      },
-                    ],
-                    [
-                      {
-                        text: "Відшкодування експлуатаційних послуг",
-                        alignment: "center",
-                        fontSize: 12,
-                      },
-                      {
-                        text: calc.amount.toFixed(2),
-                        style: "tableTextRight",
-                      },
-                    ],
-                    [
-                      { text: "Борг:", style: "tableTextRight" },
-                      {
-                        text: (
-                          props.totalCalcAmount -
-                          props.totalPayAmount -
-                          calc.amount
-                        ).toFixed(2),
-                        style: "tableTextRight",
-                      },
-                    ],
-                    [
-                      {
-                        text: "Всього до сплати, грн.:",
-                        style: "tableTextRight",
-                        bold: true,
-                      },
-                      {
-                        text: (
-                          props.totalCalcAmount - props.totalPayAmount
-                        ).toFixed(2),
-                        style: "tableTextRight",
-                        bold: true,
-                      },
-                    ],
-                  ],
-                },
-              },
-              {
-                text: [
-                  {
-                    text: "* За період спожито електроенергії: ",
-                    fontSize: 6,
-                  },
-                  {
-                    text: calc.countNow - calc.countBefore + " кВт",
-                    fontSize: 6,
-                    lineHeight: 1.2,
-                  },
-                ],
-                margin: [0, 3, 0, 0],
-              },
+      // if (selectedIdForPayment.value[0] !== undefined) {
+      //   await initPdfMake();
+      //   const selectedCalcs = props.calcRecords.filter((record) =>
+      //     selectedIdForPayment.value.includes(record.id)
+      //   );
+      //   const pages = [];
+      //   const itemsPerPage = 3;
+      //   for (let i = 0; i < selectedCalcs.length; i += itemsPerPage) {
+      //     const page = selectedCalcs.slice(i, i + itemsPerPage);
+      //     pages.push(page);
+      //   }
+      //   console.log("selectedCalcs: ", selectedCalcs[0].id);
+      //   console.log("props.counterData", props.counterData);
+      //   console.log("props.counterId", props.counterId);
+      //   console.log("pages[]: ", pages);
+      //   const content = [];
+      //   for (let i = 0; i < pages.length; i++) {
+      //     for (const calc of pages[i]) {
+      //       content.push(
+      //         {
+      //           text: [
+      //             { text: "ПОВІДОМЛЕННЯ № ", style: "header" },
+      //             {
+      //               text: calc.id,
+      //               style: "header",
+      //               lineHeight: 2,
+      //             },
+      //           ],
+      //           margin: [0, 10, 0, 0],
+      //         },
+      //         {
+      //           text: [
+      //             { text: "ПІБ: ", bold: true },
+      //             {
+      //               text: calc.name + " " + calc.surname,
+      //               style: "textItalic",
+      //               lineHeight: 1.5,
+      //             },
+      //           ],
+      //         },
+      //         {
+      //           text: [
+      //             { text: "№ Павільону:    ", bold: true },
+      //             {
+      //               text: props.counterData.pavilion + "        ",
+      //               style: "textItalic",
+      //             },
+      //             { text: "№ Місця:    ", bold: true },
+      //             {
+      //               text: props.counterData.place + "\u00A0".repeat(35),
+      //               style: "textItalic",
+      //             },
+      //             {
+      //               text: "Період споживання:    ",
+      //               bold: true,
+      //               alignment: "right",
+      //             },
+      //             {
+      //               text: calc.month,
+      //               style: "textItalic",
+      //               lineHeight: 1.5,
+      //             },
+      //           ],
+      //         },
+      //         {
+      //           // layout: "lightHorizontalLines", // optional
+      //           table: {
+      //             // headers are automatically repeated if the table spans over multiple pages
+      //             // you can declare how many rows should be treated as headers
+      //             // headerRows: 1,
+      //             widths: ["*", "auto"],
 
-              {
-                text: "―".repeat(126),
-                fontSize: 6,
-                lineHeight: 0.6,
-                margin: [-40, 0, -10, 0],
-              },
+      //             body: [
+      //               [
+      //                 {
+      //                   text: "Найменування послуг",
+      //                   style: "tableTextBold",
+      //                 },
+      //                 {
+      //                   text: "Сумма до оплати, грн.",
+      //                   style: "tableTextBold",
+      //                 },
+      //               ],
+      //               [
+      //                 {
+      //                   text: "Відшкодування експлуатаційних послуг",
+      //                   alignment: "center",
+      //                   fontSize: 12,
+      //                 },
+      //                 {
+      //                   text: calc.amount.toFixed(2),
+      //                   style: "tableTextRight",
+      //                 },
+      //               ],
+      //               [
+      //                 { text: "Борг:", style: "tableTextRight" },
+      //                 {
+      //                   text: (
+      //                     props.totalCalcAmount -
+      //                     props.totalPayAmount -
+      //                     calc.amount
+      //                   ).toFixed(2),
+      //                   style: "tableTextRight",
+      //                 },
+      //               ],
+      //               [
+      //                 {
+      //                   text: "Всього до сплати, грн.:",
+      //                   style: "tableTextRight",
+      //                   bold: true,
+      //                 },
+      //                 {
+      //                   text: (
+      //                     props.totalCalcAmount - props.totalPayAmount
+      //                   ).toFixed(2),
+      //                   style: "tableTextRight",
+      //                   bold: true,
+      //                 },
+      //               ],
+      //             ],
+      //           },
+      //         },
+      //         {
+      //           text: [
+      //             {
+      //               text: "* За період спожито електроенергії: ",
+      //               fontSize: 6,
+      //             },
+      //             {
+      //               text: calc.countNow - calc.countBefore + " кВт",
+      //               fontSize: 6,
+      //               lineHeight: 1.2,
+      //             },
+      //           ],
+      //           margin: [0, 3, 0, 0],
+      //         },
 
-              {
-                text: "Додаток (спожито електроенергії)",
-                style: "header",
-                margin: [0, 5, 0, 5],
-              },
-              {
-                table: {
-                  widths: ["auto", "auto", "auto"],
-                  body: [
-                    [
-                      {
-                        text: "Поточні показники, кВтг",
-                        style: "tableTextBold",
-                      },
-                      {
-                        text: "Попередні показники, кВтг",
-                        style: "tableTextBold",
-                      },
-                      { text: "Використано, кВтг", style: "tableTextBold" },
-                    ],
-                    [
-                      {
-                        text: calc.countNow,
-                        style: "tableTextCenter",
-                      },
-                      {
-                        text: calc.countBefore,
-                        style: "tableTextCenter",
-                      },
-                      {
-                        text: calc.countNow - calc.countBefore,
-                        style: "tableTextCenter",
-                      },
-                    ],
-                  ],
-                },
-              },
+      //         {
+      //           text: "―".repeat(126),
+      //           fontSize: 6,
+      //           lineHeight: 0.6,
+      //           margin: [-40, 0, -10, 0],
+      //         },
 
-              {
-                text: "―".repeat(126), // Может потребоваться изменить количество символов в зависимости от размера шрифта и ширины страницы
-                fontSize: 6,
-                lineHeight: 0.6,
-                margin: [-40, 5, -10, 0],
-              }
-            );
-          }
-          if (i !== pages.length - 1) {
-            content.push({
-              text: "",
-              pageBreak: "after", // Вставляем разрыв страницы после этого элемента
-            });
-          }
-        } // end for
+      //         {
+      //           text: "Додаток (спожито електроенергії)",
+      //           style: "header",
+      //           margin: [0, 5, 0, 5],
+      //         },
+      //         {
+      //           table: {
+      //             widths: ["auto", "auto", "auto"],
+      //             body: [
+      //               [
+      //                 {
+      //                   text: "Поточні показники, кВтг",
+      //                   style: "tableTextBold",
+      //                 },
+      //                 {
+      //                   text: "Попередні показники, кВтг",
+      //                   style: "tableTextBold",
+      //                 },
+      //                 { text: "Використано, кВтг", style: "tableTextBold" },
+      //               ],
+      //               [
+      //                 {
+      //                   text: calc.countNow,
+      //                   style: "tableTextCenter",
+      //                 },
+      //                 {
+      //                   text: calc.countBefore,
+      //                   style: "tableTextCenter",
+      //                 },
+      //                 {
+      //                   text: calc.countNow - calc.countBefore,
+      //                   style: "tableTextCenter",
+      //                 },
+      //               ],
+      //             ],
+      //           },
+      //         },
 
-        let docDefinition = {
-          // a string or { width: number, height: number }
-          pageSize: "A4",
-          // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
-          pageMargins: [40, 20, 10, 10],
-          content: content,
+      //         {
+      //           text: "―".repeat(126), // Может потребоваться изменить количество символов в зависимости от размера шрифта и ширины страницы
+      //           fontSize: 6,
+      //           lineHeight: 0.6,
+      //           margin: [-40, 5, -10, 0],
+      //         }
+      //       );
+      //     }
+      //     if (i !== pages.length - 1) {
+      //       content.push({
+      //         text: "",
+      //         pageBreak: "after", // Вставляем разрыв страницы после этого элемента
+      //       });
+      //     }
+      //   } // end for
 
-          styles: {
-            header: {
-              fontSize: 14,
-              bold: true,
-              alignment: "center",
-            },
-            textItalic: {
-              italics: true,
-              // alignment: "right",
-            },
-            tableTextBold: {
-              fontSize: 12,
-              bold: true,
-              alignment: "center",
-            },
-            tableTextRight: {
-              alignment: "right",
-              fontSize: 12,
-            },
-            tableTextCenter: {
-              alignment: "center",
-              fontSize: 12,
-            },
-          },
-        };
-        console.log("open PDF...");
-        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-        // console.log("pdfDocGenerator : ", pdfDocGenerator);
+      //   let docDefinition = {
+      //     // a string or { width: number, height: number }
+      //     pageSize: "A4",
+      //     // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
+      //     pageMargins: [40, 20, 10, 10],
+      //     content: content,
 
-        const pdfBlob = await new Promise((resolve, reject) => {
-          pdfDocGenerator.getBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject("Error creating Blob");
-            }
-          });
-        });
+      //     styles: {
+      //       header: {
+      //         fontSize: 14,
+      //         bold: true,
+      //         alignment: "center",
+      //       },
+      //       textItalic: {
+      //         italics: true,
+      //         // alignment: "right",
+      //       },
+      //       tableTextBold: {
+      //         fontSize: 12,
+      //         bold: true,
+      //         alignment: "center",
+      //       },
+      //       tableTextRight: {
+      //         alignment: "right",
+      //         fontSize: 12,
+      //       },
+      //       tableTextCenter: {
+      //         alignment: "center",
+      //         fontSize: 12,
+      //       },
+      //     },
+      //   };
+      //   console.log("open PDF...");
+      //   const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+      //   // console.log("pdfDocGenerator : ", pdfDocGenerator);
 
-        pdfDataURI.value = URL.createObjectURL(pdfBlob);
-        // version with not work print
-        // pdfDataURI.value = await new Promise((resolve) => {
-        //   pdfDocGenerator.getBase64((base64) => {
-        //     resolve(`data:application/pdf;base64,${base64}`);
-        //   });
-        // });
+      //   const pdfBlob = await new Promise((resolve, reject) => {
+      //     pdfDocGenerator.getBlob((blob) => {
+      //       if (blob) {
+      //         resolve(blob);
+      //       } else {
+      //         reject("Error creating Blob");
+      //       }
+      //     });
+      //   });
 
-        showPDF.value = true;
-        // console.log("pdfDataURI: ", pdfDataURI.value);
-      } else console.log("Квитанции не выбраны");
+      //   pdfDataURI.value = URL.createObjectURL(pdfBlob);
+      //   // version with not work print
+      //   // pdfDataURI.value = await new Promise((resolve) => {
+      //   //   pdfDocGenerator.getBase64((base64) => {
+      //   //     resolve(`data:application/pdf;base64,${base64}`);
+      //   //   });
+      //   // });
+
+      //   showPDF.value = true;
+      //   // console.log("pdfDataURI: ", pdfDataURI.value);
+      // } else console.log("Квитанции не выбраны");
     };
 
     const printPDF = () => {
@@ -416,7 +428,6 @@ export default {
 
     onMounted(() => {
       emit("registerMassivePayment", callMassivePayment);
-      emit("registerPrintCalculations", callPrintCalculations);
       emit("registerDeleteCalculations", callDeleteCalculations);
     });
 
@@ -504,6 +515,8 @@ export default {
       savePDF,
       searchQuery,
       clearSearch,
+      calculationsForPrint,
+      isFromCalcTable,
       props,
     };
   },
@@ -516,7 +529,18 @@ export default {
   selectedIdForPayment: {{ selectedIdForPayment }} selectedAmountForPayment:
   {{ selectedAmountForPayment }} <br />
   isСheckedForPayment: {{ isСheckedForPayment }} -->
-  <div class="modal" v-if="showPDF">
+
+  <CreatePDF
+    v-if="showPDF"
+    :calculationsForPrint="calculationsForPrint"
+    :counterData="counterData"
+    :totalCalcAmount="totalCalcAmount"
+    :totalPayAmount="totalPayAmount"
+    :isFromCalcTable="isFromCalcTable"
+    @closeFrame="(showPDF = false), (isFromCalcTable = false)"
+  />
+
+  <!-- <div class="modal" v-if="showPDF">
     <div class="modal-content">
       <div class="modal-header">
         <img @click="savePDF" src="./icons/save.png" alt="save" />
@@ -525,7 +549,7 @@ export default {
       </div>
       <iframe ref="pdfIframe" class="pdf-iframe" :src="pdfDataURI"></iframe>
     </div>
-  </div>
+  </div> -->
 
   <div class="table-scroll">
     <div v-if="showAttentionMessage" class="attention">

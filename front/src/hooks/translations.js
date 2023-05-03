@@ -133,6 +133,10 @@ const translations = {
     userProfile: "Profile",
     exit: "Exit",
     restore: "Restore",
+    addNewGroup: "Add new group",
+    formGroupName: "Group name",
+    formErrorGroupName: "Please enter Group name",
+    addCountersToGroup: "add Counters to group",
   },
   ua: {
     welcome: "Ласкаво просимо",
@@ -268,6 +272,10 @@ const translations = {
     userProfile: "Профіль",
     exit: "Вихід",
     restore: "Відновити",
+    addNewGroup: "Додати нову групу",
+    formGroupName: "Ім'я групи",
+    formErrorGroupName: "Будь-ласка введіть Ім'я групи",
+    addCountersToGroup: "Додати лічильники до групи",
   },
   ru: {
     welcome: "Добро пожаловать",
@@ -402,6 +410,10 @@ const translations = {
     userProfile: "Профиль",
     exit: "Вихід",
     restore: "Восстановить",
+    addNewGroup: "Добавить новую группу",
+    formGroupName: "Имя группы",
+    formErrorGroupName: "Пожайлуста введите Имя группы",
+    addCountersToGroup: "Добавить счетчики в группу",
   },
 };
 

@@ -1,5 +1,5 @@
 <script>
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import UserDropdown from "./UserDropdown.vue";
 
 export default {
@@ -19,18 +19,27 @@ export default {
     "showArendators",
     "totalArendators",
     "showInactiveCounters",
+    "groups",
   ],
-  emits: ["showModal", "show-calc-form", "showArendForm", "selectInactive"],
-  setup(props) {
+  emits: [
+    "showModal",
+    "show-calc-form",
+    "showArendForm",
+    "selectInactive",
+    "selectGroup",
+  ],
+  setup(props, { emit }) {
     console.log("props totalCounters: ", props.totalCounters);
     console.log("props showCounters: ", props.showCounters);
     console.log("props showCalc: ", props.showCalc);
     console.log("props totalCalcAmount: ", props.totalCalcAmount);
     console.log("props totalPayAmount: ", props.totalPayAmount);
     console.log("props counterData: ", props.counterData);
+    console.log("props groups: ", props.groups);
 
     const searchQuery = inject("searchQuery");
     const clearSearch = inject("clearSearch");
+    const selectGroup = ref("all");
 
     // debtPayment.value = props.totalCalcAmount - props.totalPayAmount;
     const debtPayment = computed(() => {
@@ -48,6 +57,12 @@ export default {
       return props.totalPayAmount && props.totalPayAmount.toFixed(2);
     });
 
+    const handleSelectChange = () => {
+      // console.log(event);
+      console.log("selectGroup: ", selectGroup.value);
+      emit("selectGroup", selectGroup.value);
+    };
+
     console.log("totalCalc: ", totalCalc.value);
     console.log("totalPay: ", totalPay.value);
     return {
@@ -56,6 +71,8 @@ export default {
       totalPay,
       searchQuery,
       clearSearch,
+      selectGroup,
+      handleSelectChange,
     };
   },
 };
@@ -123,8 +140,15 @@ export default {
               width="16"
               height="16"
             />
-            <select name="select" id="">
+            <select
+              name="select"
+              @change="handleSelectChange"
+              v-model="selectGroup"
+            >
               <option value="all">{{ $translate.t("all") }}</option>
+              <option v-for="g in groups" :key="g.id" :value="g.id">
+                {{ g.name }}
+              </option>
             </select>
           </div>
           <div class="search-input">
